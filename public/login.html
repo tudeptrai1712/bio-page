@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login | Bio Page</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+    }
+    body {
+      background: #090d16;
+      color: #f3f4f6;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .glow-orb {
+      position: absolute;
+      width: 450px;
+      height: 450px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(0,0,0,0) 70%);
+      border-radius: 50%;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      filter: blur(50px);
+    }
+    .login-card {
+      position: relative;
+      background: rgba(17, 24, 39, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(16px);
+      width: 100%;
+      max-width: 420px;
+      border-radius: 20px;
+      padding: 36px 32px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+    .login-header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .login-icon {
+      width: 56px;
+      height: 56px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      border-radius: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      color: #fff;
+      margin-bottom: 16px;
+      box-shadow: 0 8px 20px rgba(99, 102, 241, 0.4);
+    }
+    .login-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 6px;
+    }
+    .login-subtitle {
+      font-size: 0.88rem;
+      color: #9ca3af;
+    }
+    .btn-passkey {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 0.93rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s ease;
+      margin-bottom: 20px;
+    }
+    .btn-passkey:hover {
+      background: rgba(99, 102, 241, 0.2);
+      border-color: #6366f1;
+      transform: translateY(-1px);
+    }
+    .divider {
+      display: flex;
+      align-items: center;
+      text-align: center;
+      color: #6b7280;
+      font-size: 0.8rem;
+      margin-bottom: 20px;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .divider:not(:empty)::before {
+      margin-right: .5em;
+    }
+    .divider:not(:empty)::after {
+      margin-left: .5em;
+    }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-label {
+      display: block;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #d1d5db;
+      margin-bottom: 8px;
+    }
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-icon {
+      position: absolute;
+      left: 14px;
+      color: #6b7280;
+      font-size: 1rem;
+    }
+    .form-input {
+      width: 100%;
+      background: rgba(31, 41, 55, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 13px 14px 13px 42px;
+      font-size: 0.95rem;
+      color: #ffffff;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .form-input:focus {
+      border-color: #6366f1;
+      background: rgba(31, 41, 55, 0.95);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+    }
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, #6366f1, #4f46e5);
+      border: none;
+      color: #ffffff;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+      margin-top: 20px;
+    }
+    .btn-submit:hover {
+      background: linear-gradient(135deg, #4f46e5, #4338ca);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.45);
+    }
+    .error-box {
+      background: rgba(239, 68, 68, 0.15);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      margin-bottom: 18px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .error-box.show {
+      display: flex;
+    }
+    .default-hint {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: #6b7280;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px dashed rgba(255, 255, 255, 0.08);
+    }
+    .back-home {
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      color: #9ca3af;
+      font-size: 0.85rem;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .back-home:hover {
+      color: #6366f1;
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-orb"></div>
+
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-icon">
+        <i class="fas fa-fingerprint"></i>
+      </div>
+      <h1 class="login-title">Admin Dashboard</h1>
+      <p class="login-subtitle">Sign in with Passkey or Credentials</p>
+    </div>
+
+    <div class="error-box" id="error-box">
+      <i class="fas fa-circle-exclamation"></i>
+      <span id="error-text">Invalid credentials</span>
+    </div>
+
+    <!-- WebAuthn Passkey Button -->
+    <button type="button" class="btn-passkey" id="btn-passkey-login">
+      <i class="fas fa-key" style="color: #6366f1;"></i>
+      <span>Sign in with Passkey / Biometrics</span>
+    </button>
+
+    <div class="divider">or continue with password</div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label class="form-label" for="username">Username</label>
+        <div class="input-wrapper">
+          <i class="fas fa-user input-icon"></i>
+          <input type="text" id="username" class="form-input" placeholder="admin" required autofocus>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="password">Password</label>
+        <div class="input-wrapper">
+          <i class="fas fa-lock input-icon"></i>
+          <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit" id="btn-submit">
+        <span>Sign In</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </form>
+
+    <div class="default-hint">
+      Default credentials: <strong>admin</strong> / <strong>admin123</strong>
+    </div>
+
+    <a href="/" class="back-home">
+      <i class="fas fa-arrow-left"></i> Back to Bio Page
+    </a>
+  </div>
+
+  <script src="/js/webauthn-client.js"></script>
+  <script>
+    const form = document.getElementById('login-form');
+    const usernameInput = document.getElementById('username');
+    const passwordInput = document.getElementById('password');
+    const errorBox = document.getElementById('error-box');
+    const errorText = document.getElementById('error-text');
+    const btnSubmit = document.getElementById('btn-submit');
+    const btnPasskey = document.getElementById('btn-passkey-login');
+
+    // Auto redirect if already logged in
+    fetch('/api/auth/me')
+      .then(res => {
+        if (res.ok) window.location.href = '/admin.html';
+      })
+      .catch(() => {});
+
+    // Password login
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorBox.classList.remove('show');
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Signing in...';
+
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: usernameInput.value.trim(),
+            password: passwordInput.value
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          window.location.href = '/admin.html';
+        } else {
+          errorText.textContent = data.error || 'Authentication failed';
+          errorBox.classList.add('show');
+        }
+      } catch (err) {
+        errorText.textContent = 'Server connection error. Please try again.';
+        errorBox.classList.add('show');
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = '<span>Sign In</span> <i class="fas fa-arrow-right"></i>';
+      }
+    });
+
+    // Passkey / WebAuthn biometric login
+    btnPasskey.addEventListener('click', async () => {
+      if (!window.WebAuthnClient.isSupported()) {
+        errorText.textContent = 'WebAuthn is not supported on this browser or device.';
+        errorBox.classList.add('show');
+        return;
+      }
+
+      errorBox.classList.remove('show');
+      const originalText = btnPasskey.innerHTML;
+      btnPasskey.disabled = true;
+      btnPasskey.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Waiting for biometric scan...';
+
+      try {
+        const sessionKey = 'login_' + Date.now();
+        const optsRes = await fetch(`/api/auth/webauthn/auth-options?sessionKey=${sessionKey}`);
+        if (!optsRes.ok) throw new Error('Failed to get authentication challenge');
+        const options = await optsRes.json();
+
+        const formattedOpts = window.WebAuthnClient.preFormatAuthenticationOptions(options);
+        const credential = await navigator.credentials.get({ publicKey: formattedOpts });
+
+        if (!credential) {
+          throw new Error('No credential selected');
+        }
+
+        const formattedResponse = window.WebAuthnClient.formatAuthenticationResponse(credential);
+
+        const verifyRes = await fetch('/api/auth/webauthn/auth-verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            authResponse: formattedResponse,
+            sessionKey
+          })
+        });
+
+        const verifyData = await verifyRes.json();
+        if (verifyRes.ok) {
+          window.location.href = '/admin.html';
+        } else {
+          errorText.textContent = verifyData.error || 'Passkey verification failed';
+          errorBox.classList.add('show');
+        }
+      } catch (err) {
+        if (err.name !== 'NotAllowedError') {
+          errorText.textContent = err.message || 'Passkey authentication cancelled or failed';
+          errorBox.classList.add('show');
+        }
+      } finally {
+        btnPasskey.disabled = false;
+        btnPasskey.innerHTML = originalText;
+      }
+    });
+  </script>
+</body>
+</html>

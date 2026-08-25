@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Bio Page</title>
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚙️</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-icon">
+        <i class="fas fa-layer-group"></i>
+      </div>
+      <div class="brand-title">Bio Manager</div>
+    </div>
+
+    <ul class="nav-menu">
+      <li class="nav-item active" data-tab="links">
+        <button><i class="fas fa-link"></i> <span>Links</span></button>
+      </li>
+      <li class="nav-item" data-tab="profile">
+        <button><i class="fas fa-user-pen"></i> <span>Profile</span></button>
+      </li>
+      <li class="nav-item" data-tab="socials">
+        <button><i class="fas fa-share-nodes"></i> <span>Social Links</span></button>
+      </li>
+      <li class="nav-item" data-tab="appearance">
+        <button><i class="fas fa-palette"></i> <span>Appearance</span></button>
+      </li>
+      <li class="nav-item" data-tab="analytics">
+        <button><i class="fas fa-chart-line"></i> <span>Analytics</span></button>
+      </li>
+      <li class="nav-item" data-tab="settings">
+        <button><i class="fas fa-shield-halved"></i> <span>Account & Keys</span></button>
+      </li>
+    </ul>
+
+    <div class="sidebar-footer">
+      <a href="/" target="_blank" class="btn-view-site">
+        <i class="fas fa-arrow-up-right-from-square"></i>
+        <span>View Live Bio Page</span>
+      </a>
+      <button class="btn-logout" id="btn-logout">
+        <i class="fas fa-right-from-bracket"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper">
+    <header class="topbar">
+      <h1 class="topbar-title" id="tab-heading">Links</h1>
+      <div class="user-badge">
+        <div class="user-avatar" id="current-user-avatar">A</div>
+        <span id="current-username">admin</span>
+      </div>
+    </header>
+
+    <main class="content-body">
+      <!-- TAB: LINKS -->
+      <section class="tab-pane active" id="tab-links">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title"><i class="fas fa-list-check text-primary"></i> Custom Links</h2>
+              <p class="card-desc">Add, edit, toggle visibility, and reorder links on your bio page.</p>
+            </div>
+            <button class="btn btn-primary" id="btn-open-add-link">
+              <i class="fas fa-plus"></i> Add New Link
+            </button>
+          </div>
+
+          <div class="link-items-list" id="admin-links-list">
+            <!-- Dynamic Link Items rendered here -->
+            <p style="color: var(--text-muted);">Loading links...</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: PROFILE -->
+      <section class="tab-pane" id="tab-profile">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title"><i class="fas fa-user text-primary"></i> Profile Information</h2>
+              <p class="card-desc">Customize how you appear to visitors.</p>
+            </div>
+            <button class="btn btn-primary" id="btn-save-profile">
+              <i class="fas fa-floppy-disk"></i> Save Profile
+            </button>
+          </div>
+
+          <form id="form-profile">
+            <div class="avatar-upload-section">
+              <img src="" id="profile-avatar-preview" class="avatar-preview-box" alt="Avatar">
+              <div>
+                <label class="form-label">Profile Avatar</label>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                  <input type="file" id="avatar-file-input" accept="image/*" style="display: none;">
+                  <button type="button" class="btn btn-secondary" onclick="document.getElementById('avatar-file-input').click()">
+                    <i class="fas fa-upload"></i> Upload Image
+                  </button>
+                  <button type="button" class="btn btn-danger" id="btn-remove-avatar" style="padding: 10px 12px;">
+                    <i class="fas fa-trash"></i>
+                  </button>
+                </div>
+                <small style="color: var(--text-muted); display: block; margin-top: 6px;">Recommended 400x400 JPG, PNG or WebP</small>
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="profile-name-input">Display Name</label>
+                <input type="text" id="profile-name-input" class="form-control" placeholder="Alex Morgan" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profile-handle-input">Username / Handle</label>
+                <input type="text" id="profile-handle-input" class="form-control" placeholder="@alexmorgan">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="profile-tagline-input">Headline / Tagline</label>
+              <input type="text" id="profile-tagline-input" class="form-control" placeholder="Full-Stack Developer & Creator 🚀">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="profile-bio-input">Short Bio</label>
+              <textarea id="profile-bio-input" class="form-control" placeholder="Tell visitors about yourself, your skills, or what you are currently building..."></textarea>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="profile-avatar-url-input">Direct Avatar Image URL (Optional)</label>
+                <input type="url" id="profile-avatar-url-input" class="form-control" placeholder="https://example.com/avatar.jpg">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="profile-footer-input">Custom Footer Text</label>
+                <input type="text" id="profile-footer-input" class="form-control" placeholder="Built with Self-Hosted Bio Page">
+              </div>
+            </div>
+
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="seo-title-input">SEO Page Title</label>
+                <input type="text" id="seo-title-input" class="form-control" placeholder="Alex Morgan | Links & Portfolio">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="seo-desc-input">SEO Meta Description</label>
+                <input type="text" id="seo-desc-input" class="form-control" placeholder="Welcome to the official links and portfolio page of Alex Morgan.">
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- TAB: SOCIALS -->
+      <section class="tab-pane" id="tab-socials">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title"><i class="fas fa-share-nodes text-primary"></i> Social Profiles</h2>
+              <p class="card-desc">Connect your social networks. Enter the URL or handle for platforms you want to display.</p>
+            </div>
+            <button class="btn btn-primary" id="btn-save-socials">
+              <i class="fas fa-floppy-disk"></i> Save Social Links
+            </button>
+          </div>
+
+          <div class="form-grid" id="social-inputs-container">
+            <!-- Populated via Javascript -->
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: APPEARANCE -->
+      <section class="tab-pane" id="tab-appearance">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title"><i class="fas fa-palette text-primary"></i> Themes & Styling</h2>
+              <p class="card-desc">Choose a pre-built theme or customize colors to match your brand.</p>
+            </div>
+            <button class="btn btn-primary" id="btn-save-appearance">
+              <i class="fas fa-floppy-disk"></i> Save Appearance
+            </button>
+          </div>
+
+          <label class="form-label">Theme Presets</label>
+          <div class="theme-grid">
+            <div class="theme-card" data-theme-id="midnight">
+              <div class="theme-preview-bubble" style="background: linear-gradient(135deg, #0b0f19, #111827); border: 1px solid #374151;"></div>
+              <div class="theme-name">Midnight Dark</div>
+            </div>
+            <div class="theme-card" data-theme-id="glass">
+              <div class="theme-preview-bubble" style="background: linear-gradient(135deg, #1e293b, #0f172a); border: 1px solid #38bdf8;"></div>
+              <div class="theme-name">Glass Blue</div>
+            </div>
+            <div class="theme-card" data-theme-id="sunset">
+              <div class="theme-preview-bubble" style="background: linear-gradient(135deg, #2e0854, #831843); border: 1px solid #f43f5e;"></div>
+              <div class="theme-name">Neon Sunset</div>
+            </div>
+            <div class="theme-card" data-theme-id="cyberpunk">
+              <div class="theme-preview-bubble" style="background: linear-gradient(135deg, #09090b, #18181b); border: 1px solid #06b6d4;"></div>
+              <div class="theme-name">Cyberpunk</div>
+            </div>
+            <div class="theme-card" data-theme-id="emerald">
+              <div class="theme-preview-bubble" style="background: linear-gradient(135deg, #064e3b, #022c22); border: 1px solid #10b981;"></div>
+              <div class="theme-name">Emerald Forest</div>
+            </div>
+            <div class="theme-card" data-theme-id="light">
+              <div class="theme-preview-bubble" style="background: linear-gradient(135deg, #ffffff, #e2e8f0); border: 1px solid #cbd5e1;"></div>
+              <div class="theme-name" style="color: #fff;">Clean Light</div>
+            </div>
+          </div>
+
+          <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 28px 0;">
+
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label" for="accent-color-input">Custom Accent Color</label>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="color" id="accent-color-picker" style="width: 48px; height: 44px; border: none; border-radius: 8px; cursor: pointer; background: transparent;">
+                <input type="text" id="accent-color-input" class="form-control" placeholder="#6366f1" style="font-family: monospace;">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="bg-type-select">Background Type</label>
+              <select id="bg-type-select" class="form-control">
+                <option value="preset">Theme Default Gradient</option>
+                <option value="custom">Custom CSS Background / Gradient</option>
+                <option value="image">Custom Wallpaper Image URL</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group" id="bg-value-group" style="display: none;">
+            <label class="form-label" for="bg-value-input">Background Value (CSS or Image URL)</label>
+            <input type="text" id="bg-value-input" class="form-control" placeholder="e.g. radial-gradient(#1e1b4b, #0f172a) or https://images.unsplash.com/photo-...">
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: ANALYTICS -->
+      <section class="tab-pane" id="tab-analytics">
+        <div class="stats-grid">
+          <div class="stat-box">
+            <div class="stat-label">Total Bio Views</div>
+            <div class="stat-number" id="stat-total-views">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Total Link Clicks</div>
+            <div class="stat-number" id="stat-total-clicks">0</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label">Average CTR</div>
+            <div class="stat-number" id="stat-avg-ctr">0%</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title"><i class="fas fa-arrow-pointer text-primary"></i> Link Click Performance</h2>
+          </div>
+          <div id="analytics-table-container">
+            <!-- Dynamic table -->
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB: SETTINGS & WEBAUTHN KEYS -->
+      <section class="tab-pane" id="tab-settings">
+        <!-- WebAuthn Passkeys GUI Manager -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title"><i class="fas fa-fingerprint text-primary"></i> WebAuthn & Passkeys (Biometrics)</h2>
+              <p class="card-desc">Log in securely with Touch ID, Windows Hello, Face ID, or YubiKey without typing a password.</p>
+            </div>
+            <button class="btn btn-primary" id="btn-register-passkey">
+              <i class="fas fa-plus"></i> Register New Passkey
+            </button>
+          </div>
+
+          <div id="passkeys-list-container">
+            <!-- Dynamic Passkey Devices Table -->
+            <p style="color: var(--text-muted);">Loading registered passkeys...</p>
+          </div>
+        </div>
+
+        <!-- Password / Username Update -->
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title"><i class="fas fa-key text-primary"></i> Change Admin Password</h2>
+              <p class="card-desc">Update your admin credentials.</p>
+            </div>
+          </div>
+
+          <form id="form-account" style="max-width: 480px;">
+            <div class="form-group">
+              <label class="form-label" for="acc-current-password">Current Password (Required)</label>
+              <input type="password" id="acc-current-password" class="form-control" required placeholder="Enter current password">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="acc-new-username">New Username</label>
+              <input type="text" id="acc-new-username" class="form-control" placeholder="Leave blank to keep current">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="acc-new-password">New Password</label>
+              <input type="password" id="acc-new-password" class="form-control" placeholder="Min 6 characters (Leave blank to keep)">
+            </div>
+
+            <button type="submit" class="btn btn-primary" id="btn-save-account">
+              <i class="fas fa-shield-check"></i> Update Credentials
+            </button>
+          </form>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- ADD / EDIT LINK MODAL -->
+  <div class="modal-backdrop" id="modal-link">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-link-title">Add New Link</h3>
+        <button class="btn-close" id="btn-close-link-modal">&times;</button>
+      </div>
+
+      <form id="form-link-modal">
+        <input type="hidden" id="modal-link-id">
+
+        <div class="form-group">
+          <label class="form-label" for="modal-link-title-input">Title</label>
+          <input type="text" id="modal-link-title-input" class="form-control" placeholder="e.g. My GitHub Portfolio" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="modal-link-url-input">Destination URL</label>
+          <input type="url" id="modal-link-url-input" class="form-control" placeholder="https://github.com/username" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="modal-link-desc-input">Subtitle / Description (Optional)</label>
+          <input type="text" id="modal-link-desc-input" class="form-control" placeholder="Short note under the title">
+        </div>
+
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label" for="modal-link-icon-input">Icon (Emoji or FontAwesome)</label>
+            <input type="text" id="modal-link-icon-input" class="form-control" placeholder="🔗 or 💻 or fa-brands fa-github">
+          </div>
+
+          <div class="form-group" style="display: flex; flex-direction: column; justify-content: center;">
+            <label class="form-label">Highlight Card (Glow effect)</label>
+            <label class="switch" style="margin-top: 4px;">
+              <input type="checkbox" id="modal-link-highlight-input">
+              <span class="slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-link-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-link-modal">Save Link</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="admin-toast" id="admin-toast">
+    <i class="fas fa-circle-check text-success"></i>
+    <span id="toast-text">Changes saved successfully!</span>
+  </div>
+
+  <script src="/js/webauthn-client.js"></script>
+  <script src="/js/admin.js"></script>
+</body>
+</html>
