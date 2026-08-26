@@ -73,25 +73,91 @@ function preFormatAuthenticationOptions(options) {
 
 // Convert authentication response to send back to server
 function formatAuthenticationResponse(credential) {
-  return {
+  const response = {
     id: credential.id,
     rawId: bufferToBase64URL(credential.rawId),
     type: credential.type,
     response: {
       clientDataJSON: bufferToBase64URL(credential.response.clientDataJSON),
       authenticatorData: bufferToBase64URL(credential.response.authenticatorData),
-      signature: bufferToBase64URL(credential.response.signature),
-      userHandle: credential.response.userHandle ? bufferToBase64URL(credential.response.userHandle) : null
+      signature: bufferToBase64URL(credential.response.signature)
     },
-    clientExtensionResults: credential.getClientExtensionResults()
+    clientExtensionResults: credential.getClientExtensionResults ? credential.getClientExtensionResults() : {}
   };
+
+  if (credential.response.userHandle && credential.response.userHandle.byteLength > 0) {
+    response.response.userHandle = bufferToBase64URL(credential.response.userHandle);
+  } else {
+    response.response.userHandle = null;
+  }
+
+  if (credential.authenticatorAttachment) {
+    response.authenticatorAttachment = credential.authenticatorAttachment;
+  }
+
+  return response;
+}
+
+// Complete browser WebAuthn Authentication flow
+async function startAuthentication(options) {
+  if (window.SimpleWebAuthnBrowser && typeof window.SimpleWebAuthnBrowser.startAuthentication === 'function') {
+    try {
+      return await window.SimpleWebAuthnBrowser.startAuthentication(options);
+    } catch (e) {
+      if (e.name === 'NotAllowedError' || e.name === 'AbortError') {
+        throw e;
+      }
+    }
+  }
+
+  if (!window.PublicKeyCredential || !navigator.credentials || !navigator.credentials.get) {
+    throw new Error('WebAuthn is not supported on this browser or device.');
+  }
+
+  const formattedOpts = preFormatAuthenticationOptions(options);
+  const credential = await navigator.credentials.get({ publicKey: formattedOpts });
+
+  if (!credential) {
+    throw new Error('Passkey authentication was cancelled.');
+  }
+
+  return formatAuthenticationResponse(credential);
+}
+
+// Complete browser WebAuthn Registration flow
+async function startRegistration(options) {
+  if (window.SimpleWebAuthnBrowser && typeof window.SimpleWebAuthnBrowser.startRegistration === 'function') {
+    try {
+      return await window.SimpleWebAuthnBrowser.startRegistration(options);
+    } catch (e) {
+      if (e.name === 'NotAllowedError' || e.name === 'AbortError') {
+        throw e;
+      }
+    }
+  }
+
+  if (!window.PublicKeyCredential || !navigator.credentials || !navigator.credentials.create) {
+    throw new Error('WebAuthn is not supported on this browser or device.');
+  }
+
+  const formattedOpts = preFormatRegistrationOptions(options);
+  const credential = await navigator.credentials.create({ publicKey: formattedOpts });
+
+  if (!credential) {
+    throw new Error('Passkey registration was cancelled.');
+  }
+
+  return formatRegistrationResponse(credential);
 }
 
 window.WebAuthnClient = {
-  isSupported: () => window.PublicKeyCredential !== undefined,
+  isSupported: () => !!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.get && navigator.credentials.create),
   preFormatRegistrationOptions,
   formatRegistrationResponse,
   preFormatAuthenticationOptions,
-  formatAuthenticationResponse
+  formatAuthenticationResponse,
+  startAuthentication,
+  startRegistration
 };
+
 
