@@ -46,6 +46,7 @@ Images are **automatically built for `amd64` and `arm64` via GitHub Actions** an
 
 ### Option 1: Using Pre-built Image from GHCR (Recommended & Fastest)
 
+No local building or Node.js required! You can deploy directly using the production compose stack:
 No local building or Node.js setup required! Deploy instantly using the pre-built compose stack:
 
 1. **Clone the repository or download `docker-compose.prod.yml`**:
@@ -54,6 +55,7 @@ No local building or Node.js setup required! Deploy instantly using the pre-buil
    cd bio-page
    ```
 
+2. **Start the containers** (Pulls `ghcr.io/tudeptrai1712/bio-page:latest`, Redis & Watchtower):
 2. **Start the containers** (Just `docker compose up -d`, pulls `ghcr.io/tudeptrai1712/bio-page:latest`, Redis & Watchtower):
    ```bash
    docker compose -f docker-compose.prod.yml up -d
