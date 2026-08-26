@@ -3,6 +3,11 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 
 const { uploadsDir } = require('./db');
+const { Logger } = require('./logger');
+const {
+  securityHeadersMiddleware,
+  enforceJsonContentType
+} = require('./middleware/security');
 
 // Route modules
 const publicRoutes = require('./routes/public');
@@ -12,19 +17,16 @@ const adminRoutes = require('./routes/admin');
 
 const app = express();
 
+// Enable Trust Proxy for Cloudflare Tunnel / Reverse Proxies (ASVS V1)
+app.set('trust proxy', true);
+
 // Disable X-Powered-By header (prevents server fingerprinting)
 app.disable('x-powered-by');
 
-// Security Headers Middleware
-app.use((req, res, next) => {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
-  next();
-});
+// Hardened HTTP Security Headers Middleware (ASVS V14)
+app.use(securityHeadersMiddleware);
 
-// Guard: Block attempts to access internal files, dotfiles, database files, or source code
+// Path Guard: Block access to internal, database, dotfiles, or sensitive file paths (ASVS V4/V5)
 app.use((req, res, next) => {
   const normalizedPath = decodeURIComponent(req.path).toLowerCase();
   if (
@@ -38,34 +40,57 @@ app.use((req, res, next) => {
     normalizedPath.includes('.bak') ||
     normalizedPath.includes('..') ||
     normalizedPath.startsWith('/data') ||
-    normalizedPath.startsWith('/src')
+    normalizedPath.startsWith('/src') ||
+    normalizedPath.endsWith('.json') ||
+    normalizedPath.endsWith('.lock') ||
+    normalizedPath.endsWith('.yml') ||
+    normalizedPath.endsWith('.yaml')
   ) {
+    Logger.warn('[Guard] Blocked unauthorized internal path access attempt', { path: req.path, ip: req.ip });
     return res.status(403).json({ error: 'Access denied' });
   }
   next();
 });
 
-// Core Parsers
+// Core Parsers with strict size limits (ASVS V13)
 app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.use(cookieParser());
 
-// Static File Serving (with dotfiles denied)
-app.use('/uploads', express.static(uploadsDir, { dotfiles: 'deny', maxAge: '1d' }));
+// Enforce JSON Content-Type for mutating requests
+app.use('/api', enforceJsonContentType);
+
+// Uploads Static Serving with hardened download headers (ASVS V12)
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Content-Security-Policy', "default-src 'none'; style-src 'unsafe-inline'; sandbox");
+  res.setHeader('Cache-Control', 'public, max-age=86400, immutable');
+  next();
+}, express.static(uploadsDir, { dotfiles: 'deny' }));
+
+// Public Static Files
 app.use(express.static(path.join(__dirname, '..', 'public'), { dotfiles: 'deny' }));
 
-// API Routes
+// Lightweight Health Check Endpoint (for Docker & Cloudflare Tunnel healthchecks)
+app.get('/health', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime())
+  });
+});
+
+// API Route Mounts
 app.use('/api', publicRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/auth/webauthn', webauthnRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Generic Error Handler (prevents stack trace leaks to client)
+// Centralized Generic Error Handler (ASVS V7 - Prevents Stack Trace & SQL Leaks)
 app.use((err, req, res, next) => {
-  console.error('[Unhandled Error]', err.message);
-  res.status(err.status || 500).json({ error: 'Internal Server Error' });
+  Logger.error('Unhandled Server Exception', err, req);
+  res.status(err.status || 500).json({ error: err.status ? err.message : 'An unexpected error occurred. Please try again.' });
 });
 
 module.exports = app;
-
-
