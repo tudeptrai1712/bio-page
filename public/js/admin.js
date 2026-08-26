@@ -326,6 +326,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const contactWhatsappInput = document.getElementById('contact-whatsapp-input');
   const contactTelegramInput = document.getElementById('contact-telegram-input');
   const contactSignalInput = document.getElementById('contact-signal-input');
+  const contactZaloInput = document.getElementById('contact-zalo-input');
   const profileAvatarUrlInput = document.getElementById('profile-avatar-url-input');
   const profileFooterInput = document.getElementById('profile-footer-input');
   const seoTitleInput = document.getElementById('seo-title-input');
@@ -351,6 +352,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (contactWhatsappInput) contactWhatsappInput.value = currentProfile.contact_whatsapp || '';
       if (contactTelegramInput) contactTelegramInput.value = currentProfile.contact_telegram || '';
       if (contactSignalInput) contactSignalInput.value = currentProfile.contact_signal || '';
+      if (contactZaloInput) contactZaloInput.value = currentProfile.contact_zalo || '';
 
       profileAvatarUrlInput.value = currentProfile.avatar_url || '';
       profileFooterInput.value = currentProfile.footer_text || '';
@@ -387,11 +389,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   profileAvatarUrlInput.addEventListener('input', (e) => {
     updateAvatarPreview(e.target.value.trim());
-  });
-
-  document.getElementById('btn-remove-avatar').addEventListener('click', () => {
-    profileAvatarUrlInput.value = '';
-    updateAvatarPreview('');
   });
 
   avatarFileInput.addEventListener('change', async () => {
@@ -431,6 +428,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       contact_whatsapp: contactWhatsappInput ? contactWhatsappInput.value.trim() : '',
       contact_telegram: contactTelegramInput ? contactTelegramInput.value.trim() : '',
       contact_signal: contactSignalInput ? contactSignalInput.value.trim() : '',
+      contact_zalo: contactZaloInput ? contactZaloInput.value.trim() : '',
       avatar_url: profileAvatarUrlInput.value.trim(),
       footer_text: profileFooterInput.value.trim(),
       seo_title: seoTitleInput.value.trim(),
@@ -458,17 +456,27 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 3. SOCIAL LINKS MANAGEMENT
   // -------------------------------------------------------------
   const popularPlatforms = [
+    { key: 'telegram', label: 'Telegram', icon: 'fab fa-telegram', placeholder: 'https://t.me/username' },
+    { key: 'whatsapp', label: 'WhatsApp', icon: 'fab fa-whatsapp', placeholder: 'https://wa.me/1234567890' },
+    { key: 'signal', label: 'Signal', icon: 'fas fa-comment-dots', placeholder: 'https://signal.me/#p/+1234567890' },
+    { key: 'zalo', label: 'Zalo', icon: 'fas fa-message', placeholder: 'https://zalo.me/username' },
     { key: 'github', label: 'GitHub', icon: 'fab fa-github', placeholder: 'https://github.com/username' },
     { key: 'x', label: 'X / Twitter', icon: 'fab fa-x-twitter', placeholder: 'https://x.com/username' },
-    { key: 'linkedin', label: 'LinkedIn', icon: 'fab fa-linkedin', placeholder: 'https://linkedin.com/in/username' },
-    { key: 'youtube', label: 'YouTube', icon: 'fab fa-youtube', placeholder: 'https://youtube.com/@channel' },
+    { key: 'facebook', label: 'Facebook', icon: 'fab fa-facebook-f', placeholder: 'https://facebook.com/username' },
     { key: 'instagram', label: 'Instagram', icon: 'fab fa-instagram', placeholder: 'https://instagram.com/username' },
-    { key: 'discord', label: 'Discord', icon: 'fab fa-discord', placeholder: 'https://discord.gg/invite' },
-    { key: 'telegram', label: 'Telegram', icon: 'fab fa-telegram', placeholder: 'https://t.me/username' },
-    { key: 'twitch', label: 'Twitch', icon: 'fab fa-twitch', placeholder: 'https://twitch.tv/username' },
+    { key: 'threads', label: 'Threads', icon: 'fab fa-threads', placeholder: 'https://threads.net/@username' },
     { key: 'tiktok', label: 'TikTok', icon: 'fab fa-tiktok', placeholder: 'https://tiktok.com/@username' },
+    { key: 'youtube', label: 'YouTube', icon: 'fab fa-youtube', placeholder: 'https://youtube.com/@channel' },
+    { key: 'linkedin', label: 'LinkedIn', icon: 'fab fa-linkedin', placeholder: 'https://linkedin.com/in/username' },
+    { key: 'discord', label: 'Discord', icon: 'fab fa-discord', placeholder: 'https://discord.gg/invite' },
     { key: 'spotify', label: 'Spotify', icon: 'fab fa-spotify', placeholder: 'https://open.spotify.com/user/...' },
+    { key: 'twitch', label: 'Twitch', icon: 'fab fa-twitch', placeholder: 'https://twitch.tv/username' },
+    { key: 'reddit', label: 'Reddit', icon: 'fab fa-reddit', placeholder: 'https://reddit.com/user/username' },
+    { key: 'snapchat', label: 'Snapchat', icon: 'fab fa-snapchat', placeholder: 'https://snapchat.com/add/username' },
+    { key: 'pinterest', label: 'Pinterest', icon: 'fab fa-pinterest', placeholder: 'https://pinterest.com/username' },
+    { key: 'viber', label: 'Viber', icon: 'fab fa-viber', placeholder: 'viber://chat?number=...' },
     { key: 'medium', label: 'Medium', icon: 'fab fa-medium', placeholder: 'https://medium.com/@username' },
+    { key: 'patreon', label: 'Patreon', icon: 'fab fa-patreon', placeholder: 'https://patreon.com/creator' },
     { key: 'email', label: 'Email', icon: 'fas fa-envelope', placeholder: 'mailto:you@example.com' },
     { key: 'website', label: 'Personal Website', icon: 'fas fa-globe', placeholder: 'https://yourwebsite.com' }
   ];

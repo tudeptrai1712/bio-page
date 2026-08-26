@@ -109,6 +109,7 @@ function initDatabase() {
   try { db.exec("ALTER TABLE profile ADD COLUMN contact_whatsapp TEXT DEFAULT ''"); } catch(e){}
   try { db.exec("ALTER TABLE profile ADD COLUMN contact_telegram TEXT DEFAULT ''"); } catch(e){}
   try { db.exec("ALTER TABLE profile ADD COLUMN contact_signal TEXT DEFAULT ''"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN contact_zalo TEXT DEFAULT ''"); } catch(e){}
   try { db.exec("ALTER TABLE profile ADD COLUMN color_mode TEXT DEFAULT 'auto'"); } catch(e){}
 
   // Seed default admin if not exists

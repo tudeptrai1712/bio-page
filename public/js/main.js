@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const res = await fetch('/api/profile');
     if (!res.ok) throw new Error('Failed to load profile');
     const data = await res.json();
-    const { profile, links } = data;
+    const { profile, links, socials } = data;
 
     // Apply M3 Dynamic Color Tokens (Android Monet Engine)
     if (window.M3Theme) {
@@ -130,21 +130,69 @@ document.addEventListener('DOMContentLoaded', async () => {
       avatarContainer.innerHTML = `<div class="avatar-fallback">${initial}</div>`;
     }
 
-    // Direct Contacts (Email, Phone, WhatsApp, Telegram, Signal) under handle
+    // Direct Contacts & Social Networks Bar
     contactDetailsBar.innerHTML = '';
-    const contacts = [
-      { key: 'email', val: profile.contact_email, icon: 'fas fa-envelope', label: 'Email', getHref: (v) => v.startsWith('mailto:') ? v : `mailto:${v}` },
-      { key: 'phone', val: profile.contact_phone, icon: 'fas fa-phone', label: 'Phone', getHref: (v) => v.startsWith('tel:') ? v : `tel:${v}` },
-      { key: 'whatsapp', val: profile.contact_whatsapp, icon: 'fab fa-whatsapp', label: 'WhatsApp', getHref: (v) => v.startsWith('http') ? v : `https://wa.me/${v.replace(/[^0-9]/g, '')}` },
-      { key: 'telegram', val: profile.contact_telegram, icon: 'fab fa-telegram', label: 'Telegram', getHref: (v) => v.startsWith('http') ? v : `https://t.me/${v.replace('@', '')}` },
-      { key: 'signal', val: profile.contact_signal, icon: 'fas fa-comment-dots', label: 'Signal', getHref: (v) => v.startsWith('http') ? v : `https://signal.me/#p/${v}` }
+    const renderedPlatforms = new Set();
+
+    // Helper to normalize URLs based on platform type
+    function normalizeSocialUrl(platform, rawVal) {
+      const v = rawVal.trim();
+      if (v.startsWith('http://') || v.startsWith('https://') || v.startsWith('mailto:') || v.startsWith('tel:') || v.startsWith('viber:')) {
+        return v;
+      }
+      switch (platform.toLowerCase()) {
+        case 'email':
+          return `mailto:${v}`;
+        case 'phone':
+          return `tel:${v}`;
+        case 'whatsapp':
+          return `https://wa.me/${v.replace(/[^0-9]/g, '')}`;
+        case 'telegram':
+          return `https://t.me/${v.replace('@', '')}`;
+        case 'signal':
+          return `https://signal.me/#p/${v}`;
+        case 'zalo':
+          return `https://zalo.me/${v.replace(/[^0-9]/g, '')}`;
+        case 'github':
+          return `https://github.com/${v.replace('@', '')}`;
+        case 'x':
+        case 'twitter':
+          return `https://x.com/${v.replace('@', '')}`;
+        case 'instagram':
+          return `https://instagram.com/${v.replace('@', '')}`;
+        case 'threads':
+          return `https://threads.net/@${v.replace('@', '')}`;
+        case 'tiktok':
+          return `https://tiktok.com/@${v.replace('@', '')}`;
+        case 'youtube':
+          return `https://youtube.com/${v.startsWith('@') ? v : '@' + v}`;
+        case 'facebook':
+          return `https://facebook.com/${v}`;
+        case 'linkedin':
+          return `https://linkedin.com/in/${v.replace('@', '')}`;
+        case 'discord':
+          return v.startsWith('invite/') ? `https://discord.gg/${v.replace('invite/', '')}` : `https://discord.gg/${v}`;
+        default:
+          return `https://${v}`;
+      }
+    }
+
+    // 1. Render Direct Contacts from Profile tab
+    const directContacts = [
+      { key: 'email', val: profile.contact_email, icon: 'fas fa-envelope', label: 'Email' },
+      { key: 'phone', val: profile.contact_phone, icon: 'fas fa-phone', label: 'Phone' },
+      { key: 'whatsapp', val: profile.contact_whatsapp, icon: 'fab fa-whatsapp', label: 'WhatsApp' },
+      { key: 'telegram', val: profile.contact_telegram, icon: 'fab fa-telegram', label: 'Telegram' },
+      { key: 'signal', val: profile.contact_signal, icon: 'fas fa-comment-dots', label: 'Signal' },
+      { key: 'zalo', val: profile.contact_zalo, icon: 'fas fa-message', label: 'Zalo' }
     ];
 
-    contacts.forEach(c => {
+    directContacts.forEach(c => {
       if (c.val && c.val.trim()) {
+        renderedPlatforms.add(c.key.toLowerCase());
         const a = document.createElement('a');
         a.className = 'contact-icon-pill m3-ripple-surface';
-        a.href = c.getHref(c.val.trim());
+        a.href = normalizeSocialUrl(c.key, c.val);
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
         a.title = `${c.label}: ${c.val}`;
@@ -153,6 +201,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         contactDetailsBar.appendChild(a);
       }
     });
+
+    // 2. Render Social Links from Social Links tab
+    if (socials && Array.isArray(socials)) {
+      socials.forEach(s => {
+        const platKey = (s.platform || 'custom').toLowerCase();
+        if (s.url && s.url.trim() && !renderedPlatforms.has(platKey)) {
+          renderedPlatforms.add(platKey);
+          const iconClass = s.icon || iconMap[platKey] || 'fas fa-globe';
+          const label = platKey.charAt(0).toUpperCase() + platKey.slice(1);
+          const a = document.createElement('a');
+          a.className = 'contact-icon-pill m3-ripple-surface';
+          a.href = normalizeSocialUrl(platKey, s.url);
+          a.target = '_blank';
+          a.rel = 'noopener noreferrer';
+          a.title = `${label}: ${s.url}`;
+          a.setAttribute('aria-label', label);
+          a.innerHTML = `<i class="${iconClass}"></i>`;
+          contactDetailsBar.appendChild(a);
+        }
+      });
+    }
 
     // Links Rendering (matching user reference card design)
     linksContainer.innerHTML = '';
