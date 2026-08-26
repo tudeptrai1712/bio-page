@@ -1,13 +1,11 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  // Elements
   const metaTitle = document.getElementById('meta-title');
   const metaDesc = document.getElementById('meta-description');
   const avatarContainer = document.getElementById('avatar-container');
-  const nameText = document.getElementById('name-text');
+  const profileName = document.getElementById('profile-name');
   const profileHandle = document.getElementById('profile-handle');
-  const profileTagline = document.getElementById('profile-tagline');
   const profileBio = document.getElementById('profile-bio');
-  const socialsContainer = document.getElementById('socials-container');
+  const contactDetailsBar = document.getElementById('contact-details-bar');
   const linksContainer = document.getElementById('links-container');
   const footerText = document.getElementById('footer-text');
   const btnShare = document.getElementById('btn-share');
@@ -15,22 +13,31 @@ document.addEventListener('DOMContentLoaded', async () => {
   const toastTextContent = document.getElementById('toast-text-content');
 
   // Platform icon mapper
-  const socialIconMap = {
-    github: 'fab fa-github',
+  const iconMap = {
+    facebook: 'fab fa-facebook-f',
+    instagram: 'fab fa-instagram',
+    telegram: 'fab fa-telegram',
+    whatsapp: 'fab fa-whatsapp',
+    signal: 'fas fa-comment-dots',
+    zalo: 'fas fa-message',
+    youtube: 'fab fa-youtube',
+    tiktok: 'fab fa-tiktok',
     x: 'fab fa-x-twitter',
     twitter: 'fab fa-x-twitter',
-    linkedin: 'fab fa-linkedin',
-    youtube: 'fab fa-youtube',
-    instagram: 'fab fa-instagram',
-    facebook: 'fab fa-facebook',
-    discord: 'fab fa-discord',
-    telegram: 'fab fa-telegram',
-    twitch: 'fab fa-twitch',
-    tiktok: 'fab fa-tiktok',
-    spotify: 'fab fa-spotify',
     threads: 'fab fa-threads',
+    github: 'fab fa-github',
+    linkedin: 'fab fa-linkedin',
+    discord: 'fab fa-discord',
+    spotify: 'fab fa-spotify',
+    twitch: 'fab fa-twitch',
+    snapchat: 'fab fa-snapchat',
     reddit: 'fab fa-reddit',
+    pinterest: 'fab fa-pinterest',
+    viber: 'fab fa-viber',
+    wechat: 'fab fa-weixin',
     medium: 'fab fa-medium',
+    patreon: 'fab fa-patreon',
+    locket: 'fas fa-heart',
     email: 'fas fa-envelope',
     website: 'fas fa-globe',
     phone: 'fas fa-phone'
@@ -42,33 +49,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     toastMsg.classList.add('show');
     setTimeout(() => {
       toastMsg.classList.remove('show');
-    }, 2800);
+    }, 2600);
   }
 
-  // Material 3 Ripple Effect Handler
-  function createRipple(e) {
-    const target = e.currentTarget;
-    const circle = document.createElement('span');
-    const diameter = Math.max(target.clientWidth, target.clientHeight);
-    const radius = diameter / 2;
-
-    const rect = target.getBoundingClientRect();
-    circle.style.width = circle.style.height = `${diameter}px`;
-    circle.style.left = `${e.clientX - rect.left - radius}px`;
-    circle.style.top = `${e.clientY - rect.top - radius}px`;
-    circle.classList.add('m3-ripple');
-
-    const existingRipple = target.querySelector('.m3-ripple');
-    if (existingRipple) existingRipple.remove();
-
-    target.appendChild(circle);
-  }
-
-  document.querySelectorAll('.m3-ripple-surface').forEach(el => {
-    el.addEventListener('click', createRipple);
+  // Close open dropdowns when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.card-action-dots') && !e.target.closest('.card-context-menu')) {
+      document.querySelectorAll('.card-context-menu.open').forEach(menu => menu.classList.remove('open'));
+    }
   });
 
-  // Record page view analytics
+  // Track page view
   fetch('/api/analytics/view', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -79,27 +70,23 @@ document.addEventListener('DOMContentLoaded', async () => {
     const res = await fetch('/api/profile');
     if (!res.ok) throw new Error('Failed to load profile');
     const data = await res.json();
-    const { profile, links, socials } = data;
+    const { profile, links } = data;
+
+    // Apply M3 Dynamic Color Tokens (Android Monet Engine)
+    if (window.M3Theme) {
+      window.M3Theme.applyDynamicTokens(profile.accent_color || '#818cf8', profile.color_mode || 'auto');
+    }
 
     // Apply SEO & Title
     if (profile.seo_title) {
       document.title = profile.seo_title;
       if (metaTitle) metaTitle.textContent = profile.seo_title;
-    } else if (profile.name) {
-      document.title = `${profile.name} | Bio`;
+    } else if (profile.handle || profile.name) {
+      document.title = `${profile.handle || profile.name} | Links`;
     }
 
     if (profile.seo_description && metaDesc) {
       metaDesc.setAttribute('content', profile.seo_description);
-    }
-
-    // Apply Theme & Accent Color
-    if (profile.theme) {
-      document.body.setAttribute('data-theme', profile.theme);
-    }
-    if (profile.accent_color) {
-      document.documentElement.style.setProperty('--m3-sys-color-primary', profile.accent_color);
-      document.documentElement.style.setProperty('--m3-glow-primary', `${profile.accent_color}55`);
     }
 
     // Custom Background (Image or Custom Gradient)
@@ -111,113 +98,172 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.body.style.background = profile.background_value;
     }
 
-    // Profile Details
-    nameText.textContent = profile.name || 'Anonymous';
-    profileHandle.textContent = profile.handle ? (profile.handle.startsWith('@') ? profile.handle : `@${profile.handle}`) : '';
-    profileTagline.textContent = profile.tagline || '';
-    profileBio.textContent = profile.bio || '';
-    if (profile.footer_text) {
+    // Display Name & Handle
+    if (profileName) {
+      profileName.textContent = profile.name || '';
+      if (!profile.name || !profile.name.trim()) {
+        profileName.style.display = 'none';
+      } else {
+        profileName.style.display = 'block';
+      }
+    }
+
+    const handleStr = profile.handle || '@username';
+    profileHandle.textContent = handleStr.startsWith('@') ? handleStr : `@${handleStr}`;
+
+    // Bio
+    if (profileBio) {
+      profileBio.textContent = profile.bio || profile.tagline || '';
+      if (!profile.bio && !profile.tagline) profileBio.style.display = 'none';
+    }
+
+    // Footer
+    if (profile.footer_text && footerText) {
       footerText.textContent = profile.footer_text;
     }
 
     // Avatar
     if (profile.avatar_url && profile.avatar_url.trim()) {
-      avatarContainer.innerHTML = `
-        <div class="avatar-ring"></div>
-        <img src="${profile.avatar_url}" alt="${profile.name}" class="avatar-img" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\\'avatar-ring\\'></div><div class=\\'avatar-placeholder\\'>${(profile.name || 'A')[0].toUpperCase()}</div>';">
-      `;
+      avatarContainer.innerHTML = `<img src="${profile.avatar_url}" alt="${handleStr}" class="avatar-image" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\\'avatar-fallback\\'>${handleStr.replace('@','').charAt(0).toUpperCase()}</div>';">`;
     } else {
-      const initial = (profile.name || 'A').trim().charAt(0).toUpperCase();
-      avatarContainer.innerHTML = `
-        <div class="avatar-ring"></div>
-        <div class="avatar-placeholder">${initial}</div>
-      `;
+      const initial = handleStr.replace('@','').trim().charAt(0).toUpperCase() || 'U';
+      avatarContainer.innerHTML = `<div class="avatar-fallback">${initial}</div>`;
     }
 
-    // Render Social Links
-    socialsContainer.innerHTML = '';
-    if (socials && socials.length > 0) {
-      socials.forEach((item, idx) => {
-        let iconClass = item.icon;
-        if (!iconClass || !iconClass.trim()) {
-          const key = (item.platform || '').toLowerCase().trim();
-          iconClass = socialIconMap[key] || 'fas fa-link';
-        }
+    // Direct Contacts (Email, Phone, WhatsApp, Telegram, Signal) under handle
+    contactDetailsBar.innerHTML = '';
+    const contacts = [
+      { key: 'email', val: profile.contact_email, icon: 'fas fa-envelope', label: 'Email', getHref: (v) => v.startsWith('mailto:') ? v : `mailto:${v}` },
+      { key: 'phone', val: profile.contact_phone, icon: 'fas fa-phone', label: 'Phone', getHref: (v) => v.startsWith('tel:') ? v : `tel:${v}` },
+      { key: 'whatsapp', val: profile.contact_whatsapp, icon: 'fab fa-whatsapp', label: 'WhatsApp', getHref: (v) => v.startsWith('http') ? v : `https://wa.me/${v.replace(/[^0-9]/g, '')}` },
+      { key: 'telegram', val: profile.contact_telegram, icon: 'fab fa-telegram', label: 'Telegram', getHref: (v) => v.startsWith('http') ? v : `https://t.me/${v.replace('@', '')}` },
+      { key: 'signal', val: profile.contact_signal, icon: 'fas fa-comment-dots', label: 'Signal', getHref: (v) => v.startsWith('http') ? v : `https://signal.me/#p/${v}` }
+    ];
 
-        let href = item.url;
-        if (item.platform.toLowerCase() === 'email' && !href.startsWith('mailto:')) {
-          href = `mailto:${href}`;
-        }
-
+    contacts.forEach(c => {
+      if (c.val && c.val.trim()) {
         const a = document.createElement('a');
-        a.className = 'social-chip m3-ripple-surface';
-        a.href = href;
+        a.className = 'contact-icon-pill m3-ripple-surface';
+        a.href = c.getHref(c.val.trim());
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
-        a.setAttribute('aria-label', item.platform || 'Social Link');
-        a.title = item.platform || 'Link';
-        a.style.animation = `m3Enter 0.4s var(--m3-motion-easing-spring) ${idx * 50}ms forwards`;
-        a.innerHTML = `<i class="${iconClass}"></i>`;
-        a.addEventListener('click', createRipple);
-        socialsContainer.appendChild(a);
-      });
-    }
+        a.title = `${c.label}: ${c.val}`;
+        a.setAttribute('aria-label', c.label);
+        a.innerHTML = `<i class="${c.icon}"></i>`;
+        contactDetailsBar.appendChild(a);
+      }
+    });
 
-    // Render Custom Links with Staggered M3 Motion
+    // Links Rendering (matching user reference card design)
     linksContainer.innerHTML = '';
     if (links && links.length > 0) {
-      links.forEach((link, index) => {
-        const a = document.createElement('a');
-        a.className = `m3-card-link m3-ripple-surface ${link.is_highlighted ? 'highlighted' : ''}`;
-        a.href = link.url;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        a.style.opacity = '0';
-        a.style.animation = `m3Enter 0.5s var(--m3-motion-easing-emphasized-decel) ${index * 80}ms forwards`;
+      links.forEach((link, idx) => {
+        const card = document.createElement('div');
+        card.className = `bio-link-card m3-ripple-surface ${link.is_highlighted ? 'highlighted' : ''}`;
+        card.style.animation = `m3Enter 0.5s var(--m3-motion-spring-expressive) ${idx * 60}ms forwards`;
+        card.style.opacity = '0';
 
-        let iconHtml = '';
-        if (link.icon && link.icon.startsWith('fa')) {
-          iconHtml = `<i class="${link.icon}"></i>`;
-        } else if (link.icon) {
-          iconHtml = `<span>${link.icon}</span>`;
-        } else {
-          iconHtml = `<span>🔗</span>`;
+        // Detect icon
+        let iconClass = link.icon;
+        let isEmoji = false;
+        if (!iconClass || !iconClass.trim()) {
+          const lower = link.title.toLowerCase().trim();
+          iconClass = iconMap[lower] || 'fas fa-globe';
+        } else if (!iconClass.startsWith('fa') && !iconClass.includes(' ')) {
+          isEmoji = true;
         }
 
-        a.innerHTML = `
-          <div class="link-tonal-icon">${iconHtml}</div>
-          <div class="link-content-box">
-            <div class="link-headline">${escapeHtml(link.title)}</div>
-            ${link.description ? `<div class="link-subhead">${escapeHtml(link.description)}</div>` : ''}
+        const iconHtml = isEmoji ? `<span>${iconClass}</span>` : `<i class="${iconClass}"></i>`;
+
+        card.innerHTML = `
+          <div class="card-icon-area">${iconHtml}</div>
+          <div class="card-title-area">${escapeHtml(link.title)}</div>
+          <div class="card-action-dots" title="Options">
+            <i class="fas fa-ellipsis-vertical"></i>
           </div>
-          <div class="link-arrow-circle">
-            <i class="fas fa-arrow-right"></i>
+
+          <!-- 3-dots Dropdown Context Menu -->
+          <div class="card-context-menu">
+            <button class="menu-item-btn btn-menu-copy">
+              <i class="fas fa-copy"></i> Copy Link
+            </button>
+            <button class="menu-item-btn btn-menu-share">
+              <i class="fas fa-share"></i> Share
+            </button>
+            <button class="menu-item-btn btn-menu-open">
+              <i class="fas fa-external-link-alt"></i> Open
+            </button>
           </div>
         `;
 
-        a.addEventListener('click', createRipple);
-
-        // Click analytics listener
-        a.addEventListener('click', () => {
+        // Click card to open destination URL
+        card.addEventListener('click', (e) => {
+          if (e.target.closest('.card-action-dots') || e.target.closest('.card-context-menu')) {
+            return;
+          }
           fetch(`/api/analytics/click/${link.id}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ referrer: window.location.href })
           }).catch(() => {});
+          window.open(link.url, '_blank', 'noopener,noreferrer');
         });
 
-        linksContainer.appendChild(a);
+        // 3-dots menu button toggle
+        const dotsBtn = card.querySelector('.card-action-dots');
+        const menu = card.querySelector('.card-context-menu');
+
+        dotsBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const isOpen = menu.classList.contains('open');
+          document.querySelectorAll('.card-context-menu.open').forEach(m => m.classList.remove('open'));
+          if (!isOpen) menu.classList.add('open');
+        });
+
+        // Copy action
+        card.querySelector('.btn-menu-copy').addEventListener('click', (e) => {
+          e.stopPropagation();
+          menu.classList.remove('open');
+          navigator.clipboard.writeText(link.url).then(() => {
+            showToast('Link copied to clipboard! 📋');
+          });
+        });
+
+        // Share action
+        card.querySelector('.btn-menu-share').addEventListener('click', (e) => {
+          e.stopPropagation();
+          menu.classList.remove('open');
+          if (navigator.share) {
+            navigator.share({ title: link.title, url: link.url }).catch(() => {});
+          } else {
+            navigator.clipboard.writeText(link.url).then(() => showToast('Link copied! 📋'));
+          }
+        });
+
+        // Open action
+        card.querySelector('.btn-menu-open').addEventListener('click', (e) => {
+          e.stopPropagation();
+          menu.classList.remove('open');
+          window.open(link.url, '_blank', 'noopener,noreferrer');
+        });
+
+        linksContainer.appendChild(card);
       });
+
+      // Re-init dynamic motion physics on rendered elements
+      if (window.M3Theme && window.M3Theme.initMotionPhysics) {
+        window.M3Theme.initMotionPhysics();
+      }
     } else {
-      linksContainer.innerHTML = '<p style="text-align:center; color: var(--m3-sys-color-on-surface-variant); font-size: 0.95rem;">No links added yet.</p>';
+      linksContainer.innerHTML = '<p style="text-align:center; color: var(--m3-sys-color-on-surface-variant); font-size: 0.95rem;">No links found.</p>';
     }
 
-    // Share button handler
+    // Top Share Button
     if (btnShare) {
       btnShare.addEventListener('click', async () => {
         const shareData = {
-          title: profile.name || 'Bio Page',
-          text: profile.tagline || profile.bio || 'Check out my bio page!',
+          title: profile.handle || profile.name || 'Bio Page',
+          text: `Check out ${profile.handle || profile.name}'s bio page!`,
           url: window.location.href
         };
 
@@ -227,9 +273,7 @@ document.addEventListener('DOMContentLoaded', async () => {
           } catch (err) {}
         } else {
           navigator.clipboard.writeText(window.location.href).then(() => {
-            showToast('Bio link copied to clipboard! 📋✨');
-          }).catch(() => {
-            showToast('Unable to copy link.');
+            showToast('Profile link copied! 📋✨');
           });
         }
       });
@@ -237,7 +281,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   } catch (err) {
     console.error('Error rendering bio page:', err);
-    linksContainer.innerHTML = '<p style="text-align:center; color: #ef4444;">Failed to load bio page data. Please check server.</p>';
+    linksContainer.innerHTML = '<p style="text-align:center; color: #ef4444;">Failed to load bio page data.</p>';
   }
 
   function escapeHtml(str) {

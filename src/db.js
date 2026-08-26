@@ -66,6 +66,7 @@ function initDatabase() {
       contact_whatsapp TEXT DEFAULT '',
       contact_telegram TEXT DEFAULT '',
       contact_signal TEXT DEFAULT '',
+      color_mode TEXT DEFAULT 'auto',
       show_share_button INTEGER DEFAULT 1,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
@@ -102,12 +103,13 @@ function initDatabase() {
     );
   `);
 
-  // Migrations for contact columns if missing
+  // Migrations for contact and theme columns if missing
   try { db.exec("ALTER TABLE profile ADD COLUMN contact_email TEXT DEFAULT ''"); } catch(e){}
   try { db.exec("ALTER TABLE profile ADD COLUMN contact_phone TEXT DEFAULT ''"); } catch(e){}
   try { db.exec("ALTER TABLE profile ADD COLUMN contact_whatsapp TEXT DEFAULT ''"); } catch(e){}
   try { db.exec("ALTER TABLE profile ADD COLUMN contact_telegram TEXT DEFAULT ''"); } catch(e){}
   try { db.exec("ALTER TABLE profile ADD COLUMN contact_signal TEXT DEFAULT ''"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN color_mode TEXT DEFAULT 'auto'"); } catch(e){}
 
   // Seed default admin if not exists
   const userCount = db.prepare('SELECT COUNT(*) AS count FROM users').get().count;

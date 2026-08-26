@@ -3,13 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title id="meta-title">My Bio Page</title>
-  <meta name="description" id="meta-description" content="Personal links and bio">
+  <title id="meta-title">Bio Page</title>
+  <meta name="description" id="meta-description" content="Personal links, contact details, and portfolio">
   
-  <!-- Favicon -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>">
   
-  <!-- Google Fonts: Plus Jakarta Sans & Inter (Material 3 Expressive Typography) -->
+  <!-- Google Fonts: Plus Jakarta Sans & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
@@ -20,64 +19,60 @@
   <!-- Material 3 Expressive Styles -->
   <link rel="stylesheet" href="/css/style.css">
 </head>
-<body data-theme="midnight">
-  <!-- Expressive Animated Morphing Background Blobs -->
+<body data-theme="classic-gray">
+  <!-- Expressive Ambient Background Blobs -->
   <div class="bg-blob-1"></div>
-  <div class="bg-blob-2"></div>
 
-  <main class="bio-container m3-animate-in">
-    <!-- Top Action Pill Bar -->
-    <header class="top-actions-bar">
-      <button class="m3-action-btn m3-ripple-surface" id="btn-share" title="Share profile" aria-label="Share profile">
+  <main class="bio-wrapper">
+    <!-- Top Action Nav -->
+    <nav class="topbar-nav" aria-label="Page controls">
+      <a href="/login.html" class="topbar-icon-btn m3-ripple-surface" title="Admin Dashboard" aria-label="Admin Dashboard">
+        <i class="fas fa-asterisk"></i>
+      </a>
+      <button class="topbar-icon-btn m3-ripple-surface" id="btn-share" title="Share profile" aria-label="Share profile">
         <i class="fas fa-arrow-up-from-bracket"></i>
       </button>
-      <a href="/login.html" class="m3-action-btn m3-ripple-surface" title="Admin Dashboard" aria-label="Admin Dashboard">
-        <i class="fas fa-fingerprint"></i>
-      </a>
-    </header>
+    </nav>
 
-    <!-- Profile Hero Card (M3 Expressive Bento Hero) -->
-    <section class="profile-hero">
-      <div class="avatar-frame" id="avatar-container">
-        <div class="avatar-ring"></div>
-        <div class="avatar-placeholder" id="avatar-placeholder">?</div>
+    <!-- Profile Header -->
+    <section class="profile-center">
+      <div class="avatar-circle-wrapper" id="avatar-container">
+        <div class="avatar-fallback" id="avatar-placeholder">?</div>
       </div>
       
-      <h1 class="profile-title" id="profile-name">
-        <span id="name-text">Loading...</span>
-        <span class="verified-chip" title="Verified"><i class="fas fa-circle-check"></i></span>
-      </h1>
+      <h1 class="profile-display-name" id="profile-name">Your Name</h1>
+      <div class="profile-username" id="profile-handle">@yourhandle</div>
       
-      <div class="profile-handle-chip" id="profile-handle">@username</div>
-      <div class="profile-tagline" id="profile-tagline"></div>
-      <p class="profile-bio" id="profile-bio"></p>
-
-      <!-- Social Media Expressive Chips -->
-      <nav class="social-chips-grid" id="socials-container" aria-label="Social media links">
+      <!-- Direct Contact Details (Email, Phone, WhatsApp, Telegram, Signal, Zalo) directly under handle -->
+      <div class="contact-details-bar" id="contact-details-bar">
         <!-- Injected via JavaScript -->
-      </nav>
+      </div>
+
+      <div class="profile-bio-text" id="profile-bio"></div>
     </section>
 
-    <!-- Custom Links Stack -->
-    <section class="links-stack" id="links-container" aria-label="Personal links">
-      <!-- Loading skeletons with M3 Shimmer -->
-      <div class="m3-skeleton" style="height: 76px;"></div>
-      <div class="m3-skeleton" style="height: 76px;"></div>
-      <div class="m3-skeleton" style="height: 76px;"></div>
+    <!-- Links List (Custom Links & Social Links) -->
+    <section class="links-list-container" id="links-container" aria-label="Custom and Social links">
+      <!-- Loading placeholders -->
+      <div class="bio-link-card" style="height: 60px; opacity: 0.6;"></div>
+      <div class="bio-link-card" style="height: 60px; opacity: 0.6;"></div>
+      <div class="bio-link-card" style="height: 60px; opacity: 0.6;"></div>
     </section>
 
     <!-- Footer -->
-    <footer class="m3-footer" id="bio-footer">
+    <footer class="bio-page-footer" id="bio-footer">
       <p id="footer-text">Built with Self-Hosted Bio Page</p>
     </footer>
   </main>
 
-  <!-- M3 Expressive Floating Toast Notification -->
-  <div class="m3-toast" id="toast-msg">
-    <i class="fas fa-sparkles" style="color: var(--m3-sys-color-primary);"></i>
+  <!-- M3 Floating Toast Notification -->
+  <div class="bio-toast" id="toast-msg">
+    <i class="fas fa-check-circle" style="color: var(--m3-sys-color-primary);"></i>
     <span id="toast-text-content">Link copied to clipboard!</span>
   </div>
 
+  <!-- Material 3 Expressive Dynamic Color Engine & Client Logic -->
+  <script src="/js/m3-theme.js"></script>
   <script src="/js/main.js"></script>
 </body>
 </html>

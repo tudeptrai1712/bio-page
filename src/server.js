@@ -432,6 +432,12 @@ app.put('/api/admin/profile', requireAuth, async (req, res) => {
     seo_title,
     seo_description,
     footer_text,
+    contact_email,
+    contact_phone,
+    contact_whatsapp,
+    contact_telegram,
+    contact_signal,
+    color_mode,
     show_share_button
   } = req.body;
 
@@ -451,6 +457,12 @@ app.put('/api/admin/profile', requireAuth, async (req, res) => {
         seo_title = ?,
         seo_description = ?,
         footer_text = ?,
+        contact_email = ?,
+        contact_phone = ?,
+        contact_whatsapp = ?,
+        contact_telegram = ?,
+        contact_signal = ?,
+        color_mode = ?,
         show_share_button = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = 1
@@ -461,13 +473,19 @@ app.put('/api/admin/profile', requireAuth, async (req, res) => {
       bio || '',
       avatar_url || '',
       banner_url || '',
-      theme || 'midnight',
-      accent_color || '#6366f1',
+      theme || 'classic-gray',
+      accent_color || '#818cf8',
       background_type || 'preset',
-      background_value || 'midnight',
+      background_value || 'classic-gray',
       seo_title || 'My Bio Page',
       seo_description || '',
       footer_text || '',
+      contact_email || '',
+      contact_phone || '',
+      contact_whatsapp || '',
+      contact_telegram || '',
+      contact_signal || '',
+      color_mode || 'auto',
       show_share_button ? 1 : 0
     );
 
