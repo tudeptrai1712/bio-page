@@ -37,6 +37,7 @@ services:
     container_name: bio-watchtower
     restart: unless-stopped
     environment:
+      - DOCKER_API_VERSION=1.44
       - WATCHTOWER_CLEANUP=true
       - WATCHTOWER_POLL_INTERVAL=300 # Checks for new GitHub releases every 5 minutes
     volumes:
