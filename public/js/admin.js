@@ -369,6 +369,11 @@ document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('bg-value-input').value = currentProfile.background_value || '';
       toggleBgValueField(currentProfile.background_type);
 
+      const toggleAllowPassword = document.getElementById('toggle-allow-password-login');
+      if (toggleAllowPassword) {
+        toggleAllowPassword.checked = currentProfile.allow_password_login !== 0;
+      }
+
       if (window.M3Theme) {
         window.M3Theme.applyDynamicTokens(currentProfile.accent_color || '#818cf8', currentProfile.color_mode || 'auto');
       }
@@ -853,6 +858,153 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // -------------------------------------------------------------
+  // 6. PASSWORDLESS / SECURITY POLICY
+  // -------------------------------------------------------------
+  const toggleAllowPassword = document.getElementById('toggle-allow-password-login');
+  if (toggleAllowPassword) {
+    toggleAllowPassword.addEventListener('change', async () => {
+      const isAllowed = toggleAllowPassword.checked;
+      try {
+        const res = await fetch('/api/admin/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            allow_password_login: isAllowed ? 1 : 0
+          })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          currentProfile.allow_password_login = isAllowed ? 1 : 0;
+          showToast(isAllowed ? 'Password sign-in enabled.' : 'Password sign-in disabled. Passkey-only mode is active! 🔐');
+        } else {
+          toggleAllowPassword.checked = !isAllowed; // Revert switch
+          showToast(data.error || 'Failed to update sign-in policy', true);
+        }
+      } catch (err) {
+        toggleAllowPassword.checked = !isAllowed;
+        showToast('Connection error', true);
+      }
+    });
+  }
+
+  // -------------------------------------------------------------
+  // 6b. TOTP AUTHENTICATOR APP / RECOVERY
+  // -------------------------------------------------------------
+  const modalTotp = document.getElementById('modal-totp');
+  const btnSetupTotp = document.getElementById('btn-setup-totp');
+  const btnDisableTotp = document.getElementById('btn-disable-totp');
+  const btnCloseTotp = document.getElementById('btn-close-totp-modal');
+  const btnCancelTotp = document.getElementById('btn-cancel-totp-modal');
+  const totpStatusTitle = document.getElementById('totp-status-title');
+  const totpStatusDesc = document.getElementById('totp-status-desc');
+  const totpQrImg = document.getElementById('totp-qr-img');
+  const totpSecretKey = document.getElementById('totp-secret-key');
+  const btnCopyTotpSecret = document.getElementById('btn-copy-totp-secret');
+  const formTotpVerify = document.getElementById('form-totp-verify');
+  const totpVerifyCode = document.getElementById('totp-verify-code');
+
+  async function loadTotpStatus() {
+    try {
+      const res = await fetch('/api/auth/totp/status');
+      const data = await res.json();
+      if (data.enabled) {
+        totpStatusTitle.innerHTML = 'Status: <span style="color: #10b981; font-weight: 700;">Active & Protected 🛡️</span>';
+        totpStatusDesc.textContent = 'Authenticator App (TOTP) is active. You can use 6-digit codes to recover or sign in at any time.';
+        btnSetupTotp.innerHTML = '<i class="fas fa-arrows-rotate"></i> Reconfigure Authenticator';
+        btnDisableTotp.style.display = 'inline-block';
+      } else {
+        totpStatusTitle.textContent = 'Status: Not Configured';
+        totpStatusDesc.textContent = 'Setup an authenticator app to enable 6-digit recovery login when passkeys or passwords are unavailable.';
+        btnSetupTotp.innerHTML = '<i class="fas fa-qrcode"></i> Setup Authenticator';
+        btnDisableTotp.style.display = 'none';
+      }
+    } catch (err) {}
+  }
+
+  if (btnSetupTotp) {
+    btnSetupTotp.addEventListener('click', async () => {
+      try {
+        showToast('Generating authenticator QR code...');
+        const res = await fetch('/api/auth/totp/setup-generate', { method: 'POST' });
+        const data = await res.json();
+        if (res.ok) {
+          totpSecretKey.textContent = data.secret;
+          totpQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(data.otpauthUrl)}`;
+          totpVerifyCode.value = '';
+          modalTotp.classList.add('active');
+          totpVerifyCode.focus();
+        } else {
+          showToast(data.error || 'Failed to initialize TOTP setup', true);
+        }
+      } catch (err) {
+        showToast('Connection error', true);
+      }
+    });
+  }
+
+  function closeTotpModal() {
+    if (modalTotp) modalTotp.classList.remove('active');
+    if (totpVerifyCode) totpVerifyCode.value = '';
+  }
+
+  if (btnCloseTotp) btnCloseTotp.addEventListener('click', closeTotpModal);
+  if (btnCancelTotp) btnCancelTotp.addEventListener('click', closeTotpModal);
+
+  if (btnCopyTotpSecret) {
+    btnCopyTotpSecret.addEventListener('click', () => {
+      const text = totpSecretKey.textContent.trim();
+      if (!text) return;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Secret key copied to clipboard! 📋');
+      });
+    });
+  }
+
+  if (formTotpVerify) {
+    formTotpVerify.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const code = totpVerifyCode.value.trim();
+      if (!code) return;
+
+      try {
+        showToast('Verifying code...');
+        const res = await fetch('/api/auth/totp/setup-verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('Authenticator App (TOTP) activated! 🛡️✨');
+          closeTotpModal();
+          loadTotpStatus();
+        } else {
+          showToast(data.error || 'Invalid verification code', true);
+        }
+      } catch (err) {
+        showToast('Verification failed', true);
+      }
+    });
+  }
+
+  if (btnDisableTotp) {
+    btnDisableTotp.addEventListener('click', async () => {
+      if (!confirm('Are you sure you want to disable Authenticator App (TOTP) recovery?')) return;
+      try {
+        const res = await fetch('/api/auth/totp/disable', { method: 'POST' });
+        if (res.ok) {
+          showToast('Authenticator App (TOTP) disabled.');
+          loadTotpStatus();
+        } else {
+          showToast('Failed to disable TOTP', true);
+        }
+      } catch (err) {
+        showToast('Connection error', true);
+      }
+    });
+  }
+
+  // -------------------------------------------------------------
   // 7. ACCOUNT CREDENTIALS UPDATE
   // -------------------------------------------------------------
   const formAccount = document.getElementById('form-account');
@@ -888,6 +1040,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadLinks();
   loadProfile();
   loadSocials();
+  loadTotpStatus();
 
   function escapeHtml(str) {
     if (!str) return '';

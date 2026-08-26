@@ -253,7 +253,7 @@
         <i class="fas fa-fingerprint"></i>
       </div>
       <h1 class="login-title">Admin Console</h1>
-      <p class="login-subtitle">Sign in with Passkey or Password</p>
+      <p class="login-subtitle" id="login-subtitle">Sign in with Passkey or Password</p>
     </div>
 
     <div class="error-box" id="error-box">
@@ -267,7 +267,7 @@
       <span>Sign in with Passkey / Biometrics</span>
     </button>
 
-    <div class="divider">or enter password</div>
+    <div class="divider" id="login-divider">or enter password</div>
 
     <form id="login-form">
       <div class="form-group">
@@ -292,7 +292,38 @@
       </button>
     </form>
 
-    <div style="text-align: center; margin-top: 20px;">
+    <!-- Fallback / Recovery TOTP Form -->
+    <form id="totp-form" style="display: none; margin-top: 12px;">
+      <div class="form-group">
+        <label class="form-label" for="totp-username">Username</label>
+        <div class="input-wrapper">
+          <i class="fas fa-user input-icon"></i>
+          <input type="text" id="totp-username" class="form-input" placeholder="admin" autocomplete="username">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="totp-code">6-Digit Authenticator Code</label>
+        <div class="input-wrapper">
+          <i class="fas fa-shield-halved input-icon"></i>
+          <input type="text" id="totp-code" class="form-input" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="one-time-code" style="letter-spacing: 4px; font-size: 1.15rem; font-weight: 700; text-align: center;">
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit m3-ripple-surface" id="btn-totp-submit" style="margin-top: 10px;">
+        <span>Verify Code & Sign In</span>
+        <i class="fas fa-arrow-right"></i>
+      </button>
+    </form>
+
+    <!-- Recovery / Fallback Links -->
+    <div style="text-align: center; margin-top: 16px;">
+      <button type="button" id="btn-toggle-totp" style="background: none; border: none; color: var(--text-muted); font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 4px; transition: color 0.2s;">
+        <i class="fas fa-shield-halved"></i> <span id="toggle-totp-text">Sign in with Authenticator App (TOTP)</span>
+      </button>
+    </div>
+
+    <div style="text-align: center; margin-top: 14px;">
       <a href="/" class="back-home">
         <i class="fas fa-arrow-left"></i> Back to Bio Page
       </a>
@@ -303,12 +334,26 @@
   <script src="/js/m3-theme.js"></script>
   <script src="/js/webauthn-client.js"></script>
   <script>
-    // Sync dynamic theme from server profile
+    let isPasswordAllowed = true;
+    let isTotpActive = false;
+
+    // Sync dynamic theme and passwordless mode from server profile
     fetch('/api/profile')
       .then(r => r.json())
       .then(data => {
-        if (data && data.profile && window.M3Theme) {
-          window.M3Theme.applyDynamicTokens(data.profile.accent_color || '#818cf8', data.profile.color_mode || 'auto');
+        if (data && data.profile) {
+          if (window.M3Theme) {
+            window.M3Theme.applyDynamicTokens(data.profile.accent_color || '#818cf8', data.profile.color_mode || 'auto');
+          }
+          if (data.profile.allow_password_login === 0) {
+            isPasswordAllowed = false;
+            const form = document.getElementById('login-form');
+            const divider = document.getElementById('login-divider');
+            const subtitle = document.getElementById('login-subtitle');
+            if (form) form.style.display = 'none';
+            if (divider) divider.style.display = 'none';
+            if (subtitle) subtitle.textContent = 'Passwordless Mode: Sign in with Passkey';
+          }
         }
       })
       .catch(() => {});
@@ -321,12 +366,75 @@
       .catch(() => {});
 
     const form = document.getElementById('login-form');
+    const totpForm = document.getElementById('totp-form');
     const usernameInput = document.getElementById('username');
     const passwordInput = document.getElementById('password');
+    const totpUsernameInput = document.getElementById('totp-username');
+    const totpCodeInput = document.getElementById('totp-code');
     const errorBox = document.getElementById('error-box');
     const errorText = document.getElementById('error-text');
     const btnSubmit = document.getElementById('btn-submit');
+    const btnTotpSubmit = document.getElementById('btn-totp-submit');
     const btnPasskey = document.getElementById('btn-passkey-login');
+    const btnToggleTotp = document.getElementById('btn-toggle-totp');
+    const toggleTotpText = document.getElementById('toggle-totp-text');
+    const loginDivider = document.getElementById('login-divider');
+
+    // Toggle TOTP view
+    btnToggleTotp.addEventListener('click', () => {
+      isTotpActive = !isTotpActive;
+      errorBox.classList.remove('show');
+      if (isTotpActive) {
+        totpForm.style.display = 'block';
+        if (form) form.style.display = 'none';
+        if (btnPasskey) btnPasskey.style.display = 'none';
+        if (loginDivider) loginDivider.style.display = 'none';
+        toggleTotpText.textContent = isPasswordAllowed ? 'Back to Passkey / Password Login' : 'Back to Passkey Login';
+        totpCodeInput.focus();
+      } else {
+        totpForm.style.display = 'none';
+        if (btnPasskey) btnPasskey.style.display = 'flex';
+        if (isPasswordAllowed) {
+          if (form) form.style.display = 'block';
+          if (loginDivider) loginDivider.style.display = 'flex';
+        }
+        toggleTotpText.textContent = 'Sign in with Authenticator App (TOTP)';
+      }
+    });
+
+    // TOTP Recovery Login
+    totpForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorBox.classList.remove('show');
+      btnTotpSubmit.disabled = true;
+      btnTotpSubmit.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verifying Code...';
+
+      try {
+        const res = await fetch('/api/auth/totp/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: totpUsernameInput.value.trim(),
+            code: totpCodeInput.value.trim()
+          })
+        });
+
+        const data = await res.json();
+        if (res.ok) {
+          window.location.href = '/admin.html';
+        } else {
+          errorText.textContent = data.error || 'Invalid TOTP code';
+          errorBox.classList.add('show');
+          btnTotpSubmit.disabled = false;
+          btnTotpSubmit.innerHTML = '<span>Verify Code & Sign In</span> <i class="fas fa-arrow-right"></i>';
+        }
+      } catch (err) {
+        errorText.textContent = 'Connection error. Please try again.';
+        errorBox.classList.add('show');
+        btnTotpSubmit.disabled = false;
+        btnTotpSubmit.innerHTML = '<span>Verify Code & Sign In</span> <i class="fas fa-arrow-right"></i>';
+      }
+    });
 
     // Password login
     form.addEventListener('submit', async (e) => {
@@ -349,13 +457,14 @@
         if (res.ok) {
           window.location.href = '/admin.html';
         } else {
-          errorText.textContent = data.error || 'Authentication failed';
+          errorText.textContent = data.error || 'Invalid credentials';
           errorBox.classList.add('show');
+          btnSubmit.disabled = false;
+          btnSubmit.innerHTML = '<span>Sign In</span> <i class="fas fa-arrow-right"></i>';
         }
       } catch (err) {
-        errorText.textContent = 'Server connection error. Please try again.';
+        errorText.textContent = 'Connection error. Please try again.';
         errorBox.classList.add('show');
-      } finally {
         btnSubmit.disabled = false;
         btnSubmit.innerHTML = '<span>Sign In</span> <i class="fas fa-arrow-right"></i>';
       }

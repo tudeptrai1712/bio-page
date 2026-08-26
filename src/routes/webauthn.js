@@ -2,8 +2,11 @@ const express = require('express');
 const router = express.Router();
 
 const { db } = require('../db');
-const { COOKIE_NAME, generateToken, requireAuth } = require('../auth');
+const { generateToken, setAuthCookie, requireAuth } = require('../auth');
 const { setChallenge, getChallenge, delChallenge } = require('../redis');
+const { authRateLimiter } = require('../middleware/rateLimit');
+const { adminCacheControl } = require('../middleware/security');
+const { Logger } = require('../logger');
 const {
   getRegistrationOptions,
   verifyRegistration,
@@ -12,7 +15,7 @@ const {
 } = require('../webauthn');
 
 // 1. Generate Registration Options (Admin only)
-router.get('/register-options', requireAuth, async (req, res) => {
+router.get('/register-options', requireAuth, adminCacheControl, async (req, res) => {
   try {
     const user = db.prepare('SELECT id, username FROM users WHERE id = ?').get(req.user.id);
     if (!user) return res.status(404).json({ error: 'User not found' });
@@ -25,13 +28,13 @@ router.get('/register-options', requireAuth, async (req, res) => {
 
     res.json(options);
   } catch (err) {
-    console.error('Error generating registration options:', err);
+    Logger.error('Error generating registration options', err, req);
     res.status(500).json({ error: 'Failed to generate registration options' });
   }
 });
 
 // 2. Verify Registration Response & Save Passkey (Admin only)
-router.post('/register-verify', requireAuth, async (req, res) => {
+router.post('/register-verify', requireAuth, authRateLimiter, async (req, res) => {
   try {
     const { registrationResponse, deviceName } = req.body;
     const userId = req.user.id;
@@ -67,18 +70,21 @@ router.post('/register-verify', requireAuth, async (req, res) => {
       );
 
       await delChallenge(`reg:${userId}`);
+
+      Logger.audit('PASSKEY_REGISTERED', req, { userId, deviceName: deviceName || 'Biometric Key' });
+
       res.json({ success: true, message: 'Passkey registered successfully!' });
     } else {
       res.status(400).json({ error: 'Verification failed' });
     }
   } catch (err) {
-    console.error('Error verifying passkey registration:', err);
+    Logger.error('Error verifying passkey registration', err, req);
     res.status(400).json({ error: err.message || 'Passkey verification failed' });
   }
 });
 
 // 3. Generate Authentication Options (Public - for login)
-router.get('/auth-options', async (req, res) => {
+router.get('/auth-options', adminCacheControl, async (req, res) => {
   try {
     const authenticators = db.prepare('SELECT credential_id, transports FROM authenticators').all();
     const options = await getAuthenticationOptions(authenticators);
@@ -89,13 +95,13 @@ router.get('/auth-options', async (req, res) => {
 
     res.json(options);
   } catch (err) {
-    console.error('Error generating auth options:', err);
+    Logger.error('Error generating auth options', err, req);
     res.status(500).json({ error: 'Failed to generate authentication options' });
   }
 });
 
 // 4. Verify Authentication Response (Public - logs in with Passkey)
-router.post('/auth-verify', async (req, res) => {
+router.post('/auth-verify', authRateLimiter, async (req, res) => {
   try {
     const { authResponse, sessionKey } = req.body;
     const challengeKey = sessionKey || 'public_login';
@@ -105,9 +111,10 @@ router.post('/auth-verify', async (req, res) => {
       return res.status(400).json({ error: 'Login challenge expired. Please retry.' });
     }
 
-    const credentialId = authResponse.id;
+    const credentialId = authResponse?.id;
     const authenticator = db.prepare('SELECT * FROM authenticators WHERE credential_id = ?').get(credentialId);
     if (!authenticator) {
+      Logger.warn('[Auth] Unknown passkey credential attempted', req);
       return res.status(400).json({ error: 'Unrecognized passkey device.' });
     }
 
@@ -132,27 +139,24 @@ router.post('/auth-verify', async (req, res) => {
 
       await delChallenge(`auth:${challengeKey}`);
 
-      // Issue JWT session token
+      // Issue JWT session token with dynamic secure cookies
       const token = generateToken(user);
-      res.cookie(COOKIE_NAME, token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000
-      });
+      setAuthCookie(res, token, req);
+
+      Logger.audit('LOGIN_SUCCESS_PASSKEY', req, { userId: user.id, username: user.username, authenticatorId: authenticator.id });
 
       res.json({
         success: true,
         user: { id: user.id, username: user.username }
       });
     } else {
+      Logger.warn('[Auth] Passkey authentication verification failed', req);
       res.status(400).json({ error: 'Passkey verification failed' });
     }
   } catch (err) {
-    console.error('Error verifying passkey authentication:', err);
+    Logger.error('Error verifying passkey authentication', err, req);
     res.status(400).json({ error: err.message || 'Passkey authentication failed' });
   }
 });
 
 module.exports = router;
-

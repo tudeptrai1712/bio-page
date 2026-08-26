@@ -30,6 +30,8 @@ function initDatabase() {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       username TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
+      totp_secret TEXT DEFAULT '',
+      totp_enabled INTEGER DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -68,6 +70,7 @@ function initDatabase() {
       contact_signal TEXT DEFAULT '',
       color_mode TEXT DEFAULT 'auto',
       show_share_button INTEGER DEFAULT 1,
+      allow_password_login INTEGER DEFAULT 1,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -103,7 +106,7 @@ function initDatabase() {
     );
   `);
 
-  // Migrations for contact and theme columns if missing
+  // Migrations for contact, theme, and security columns if missing
   try { db.exec("ALTER TABLE profile ADD COLUMN contact_email TEXT DEFAULT ''"); } catch(e){}
   try { db.exec("ALTER TABLE profile ADD COLUMN contact_phone TEXT DEFAULT ''"); } catch(e){}
   try { db.exec("ALTER TABLE profile ADD COLUMN contact_whatsapp TEXT DEFAULT ''"); } catch(e){}
@@ -111,6 +114,9 @@ function initDatabase() {
   try { db.exec("ALTER TABLE profile ADD COLUMN contact_signal TEXT DEFAULT ''"); } catch(e){}
   try { db.exec("ALTER TABLE profile ADD COLUMN contact_zalo TEXT DEFAULT ''"); } catch(e){}
   try { db.exec("ALTER TABLE profile ADD COLUMN color_mode TEXT DEFAULT 'auto'"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN allow_password_login INTEGER DEFAULT 1"); } catch(e){}
+  try { db.exec("ALTER TABLE users ADD COLUMN totp_secret TEXT DEFAULT ''"); } catch(e){}
+  try { db.exec("ALTER TABLE users ADD COLUMN totp_enabled INTEGER DEFAULT 0"); } catch(e){}
 
   // Seed default admin if not exists
   const userCount = db.prepare('SELECT COUNT(*) AS count FROM users').get().count;

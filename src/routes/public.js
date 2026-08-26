@@ -8,6 +8,11 @@ const {
   incrRealtimeView,
   incrRealtimeClick
 } = require('../redis');
+const { publicRateLimiter } = require('../middleware/rateLimit');
+const { Logger } = require('../logger');
+
+// Apply public rate limiter (120 req/min - ASVS V13)
+router.use(publicRateLimiter);
 
 // Get full bio page public profile (with Redis caching)
 router.get('/profile', async (req, res) => {
@@ -24,11 +29,16 @@ router.get('/profile', async (req, res) => {
         theme, accent_color, background_type, background_value,
         seo_title, seo_description, footer_text,
         contact_email, contact_phone, contact_whatsapp, contact_telegram, contact_signal, contact_zalo,
-        color_mode, show_share_button
+        color_mode, show_share_button, allow_password_login
       FROM profile WHERE id = 1
     `).get();
     const links = db.prepare('SELECT id, title, url, description, icon, is_highlighted, display_order FROM links WHERE enabled = 1 ORDER BY display_order ASC, id ASC').all();
     const socials = db.prepare('SELECT id, platform, url, icon, display_order FROM social_links WHERE enabled = 1 ORDER BY display_order ASC, id ASC').all();
+
+    const user = db.prepare('SELECT totp_enabled FROM users WHERE id = 1').get();
+    if (profile) {
+      profile.totp_enabled = !!(user && user.totp_enabled === 1);
+    }
 
     const responseData = {
       profile: profile || {},
@@ -42,7 +52,7 @@ router.get('/profile', async (req, res) => {
     res.setHeader('X-Cache', 'MISS');
     res.json(responseData);
   } catch (err) {
-    console.error('Error fetching public profile:', err);
+    Logger.error('Error fetching public profile', err, req);
     res.status(500).json({ error: 'Failed to load profile' });
   }
 });
@@ -50,8 +60,8 @@ router.get('/profile', async (req, res) => {
 // Record page view analytics
 router.post('/analytics/view', async (req, res) => {
   try {
-    const referrer = req.body.referrer || req.get('referrer') || '';
-    const userAgent = req.get('user-agent') || '';
+    const referrer = String(req.body.referrer || req.get('referrer') || '');
+    const userAgent = String(req.get('user-agent') || '');
 
     // Atomic Redis increment
     incrRealtimeView();
@@ -72,10 +82,10 @@ router.post('/analytics/view', async (req, res) => {
 router.post('/analytics/click/:id', async (req, res) => {
   try {
     const linkId = parseInt(req.params.id, 10);
-    if (isNaN(linkId)) return res.status(400).json({ error: 'Invalid link ID' });
+    if (isNaN(linkId) || linkId <= 0) return res.status(400).json({ error: 'Invalid link ID' });
 
-    const referrer = req.body.referrer || req.get('referrer') || '';
-    const userAgent = req.get('user-agent') || '';
+    const referrer = String(req.body.referrer || req.get('referrer') || '');
+    const userAgent = String(req.get('user-agent') || '');
 
     // Atomic Redis increment
     incrRealtimeClick(linkId);
@@ -96,4 +106,3 @@ router.post('/analytics/click/:id', async (req, res) => {
 });
 
 module.exports = router;
-
