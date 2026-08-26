@@ -802,7 +802,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Register Passkey
   btnRegisterPasskey.addEventListener('click', async () => {
-    if (!window.WebAuthnClient.isSupported()) {
+    if (!window.WebAuthnAdmin.isSupported()) {
       showToast('WebAuthn is not supported by your browser.', true);
       return;
     }
@@ -816,7 +816,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!optsRes.ok) throw new Error('Failed to get registration options');
       const options = await optsRes.json();
 
-      const formattedResponse = await window.WebAuthnClient.startRegistration(options);
+      const formattedResponse = await window.WebAuthnAdmin.startRegistration(options);
 
       const verifyRes = await fetch('/api/auth/webauthn/register-verify', {
         method: 'POST',

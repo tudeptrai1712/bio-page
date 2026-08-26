@@ -75,9 +75,12 @@ async function delCache(key) {
   memoryFallback.delete(key);
 }
 
-// Invalidate public profile cache
+// Invalidate public profile & SSR HTML cache
 async function invalidateProfileCache() {
-  await delCache('bio:public_profile');
+  await Promise.all([
+    delCache('bio:public_profile'),
+    delCache('bio:ssr_html')
+  ]);
 }
 
 // WebAuthn challenge store (5 minutes TTL)

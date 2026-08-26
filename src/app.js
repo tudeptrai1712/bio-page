@@ -4,10 +4,13 @@ const cookieParser = require('cookie-parser');
 
 const { uploadsDir } = require('./db');
 const { Logger } = require('./logger');
+const { requireAuth, requireAuthOrRedirect } = require('./auth');
 const {
   securityHeadersMiddleware,
+  adminCacheControl,
   enforceJsonContentType
 } = require('./middleware/security');
+const { renderPublicBioPage } = require('./renderer');
 
 // Route modules
 const publicRoutes = require('./routes/public');
@@ -41,7 +44,6 @@ app.use((req, res, next) => {
     normalizedPath.includes('..') ||
     normalizedPath.startsWith('/data') ||
     normalizedPath.startsWith('/src') ||
-    normalizedPath.endsWith('.json') ||
     normalizedPath.endsWith('.lock') ||
     normalizedPath.endsWith('.yml') ||
     normalizedPath.endsWith('.yaml')
@@ -57,6 +59,49 @@ app.use(express.json({ limit: '2mb' }));
 app.use(express.urlencoded({ extended: true, limit: '2mb' }));
 app.use(cookieParser());
 
+// Lightweight Health Check Endpoint (for Docker & Cloudflare Tunnel healthchecks)
+app.get('/health', (req, res) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime())
+  });
+});
+
+// -------------------------------------------------------------
+// SERVER-SIDE RENDERED PUBLIC BIO PAGE (100% Server Processing)
+// -------------------------------------------------------------
+app.get(['/', '/index.html'], async (req, res, next) => {
+  try {
+    const { html, fromCache } = await renderPublicBioPage();
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    res.setHeader('X-Cache', fromCache ? 'HIT' : 'MISS');
+    res.send(html);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// -------------------------------------------------------------
+// PROTECTED ADMIN DASHBOARD & ASSETS (Zero Public Leakage)
+// -------------------------------------------------------------
+
+// Admin Dashboard HTML - Authenticated access only
+app.get(['/admin', '/admin.html'], requireAuthOrRedirect, adminCacheControl, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'admin', 'admin.html'));
+});
+
+// Admin Dashboard JavaScript - Authenticated access only
+app.get('/admin/admin.js', requireAuth, adminCacheControl, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'admin', 'admin.js'));
+});
+
+// Admin WebAuthn Registration Module - Authenticated access only
+app.get('/admin/webauthn-admin.js', requireAuth, adminCacheControl, (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'admin', 'webauthn-admin.js'));
+});
+
 // Enforce JSON Content-Type for mutating requests
 app.use('/api', enforceJsonContentType);
 
@@ -68,18 +113,8 @@ app.use('/uploads', (req, res, next) => {
   next();
 }, express.static(uploadsDir, { dotfiles: 'deny' }));
 
-// Public Static Files
+// Public Static Files (Only public CSS, icons, login screen, and main.js)
 app.use(express.static(path.join(__dirname, '..', 'public'), { dotfiles: 'deny' }));
-
-// Lightweight Health Check Endpoint (for Docker & Cloudflare Tunnel healthchecks)
-app.get('/health', (req, res) => {
-  res.setHeader('Cache-Control', 'no-store');
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString(),
-    uptime: Math.floor(process.uptime())
-  });
-});
 
 // API Route Mounts
 app.use('/api', publicRoutes);
