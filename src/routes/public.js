@@ -23,7 +23,7 @@ router.get('/profile', async (req, res) => {
         name, handle, tagline, bio, avatar_url, banner_url,
         theme, accent_color, background_type, background_value,
         seo_title, seo_description, footer_text,
-        contact_email, contact_phone, contact_whatsapp, contact_telegram, contact_signal,
+        contact_email, contact_phone, contact_whatsapp, contact_telegram, contact_signal, contact_zalo,
         color_mode, show_share_button
       FROM profile WHERE id = 1
     `).get();

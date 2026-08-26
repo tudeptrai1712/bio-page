@@ -40,6 +40,7 @@ router.put('/profile', async (req, res) => {
     contact_whatsapp,
     contact_telegram,
     contact_signal,
+    contact_zalo,
     color_mode,
     show_share_button
   } = req.body;
@@ -65,6 +66,7 @@ router.put('/profile', async (req, res) => {
         contact_whatsapp = ?,
         contact_telegram = ?,
         contact_signal = ?,
+        contact_zalo = ?,
         color_mode = ?,
         show_share_button = ?,
         updated_at = CURRENT_TIMESTAMP
@@ -88,6 +90,7 @@ router.put('/profile', async (req, res) => {
       contact_whatsapp || '',
       contact_telegram || '',
       contact_signal || '',
+      contact_zalo || '',
       color_mode || 'auto',
       show_share_button ? 1 : 0
     );
