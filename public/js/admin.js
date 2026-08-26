@@ -360,11 +360,16 @@ document.addEventListener('DOMContentLoaded', async () => {
       updateAvatarPreview(currentProfile.avatar_url);
 
       selectThemeCard(currentProfile.theme || 'classic-gray');
+      selectModeBtn(currentProfile.color_mode || 'auto');
       document.getElementById('accent-color-picker').value = currentProfile.accent_color || '#818cf8';
       document.getElementById('accent-color-input').value = currentProfile.accent_color || '#818cf8';
       document.getElementById('bg-type-select').value = currentProfile.background_type || 'preset';
       document.getElementById('bg-value-input').value = currentProfile.background_value || '';
       toggleBgValueField(currentProfile.background_type);
+
+      if (window.M3Theme) {
+        window.M3Theme.applyDynamicTokens(currentProfile.accent_color || '#818cf8', currentProfile.color_mode || 'auto');
+      }
 
     } catch (err) {
       showToast('Error loading profile settings', true);
@@ -541,8 +546,33 @@ document.addEventListener('DOMContentLoaded', async () => {
   const bgValueInput = document.getElementById('bg-value-input');
 
   let selectedTheme = 'midnight';
+  let selectedMode = 'auto';
 
-  function selectThemeCard(themeId) {
+  function selectModeBtn(mode) {
+    selectedMode = mode || 'auto';
+    document.querySelectorAll('.btn-mode-select').forEach(b => {
+      if (b.getAttribute('data-mode') === selectedMode) {
+        b.classList.add('active');
+        b.classList.remove('btn-secondary');
+        b.classList.add('btn-primary');
+      } else {
+        b.classList.remove('active');
+        b.classList.add('btn-secondary');
+        b.classList.remove('btn-primary');
+      }
+    });
+    if (window.M3Theme) {
+      window.M3Theme.applyDynamicTokens(accentInput.value.trim() || '#818cf8', selectedMode);
+    }
+  }
+
+  document.querySelectorAll('.btn-mode-select').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectModeBtn(btn.getAttribute('data-mode'));
+    });
+  });
+
+  function selectThemeCard(themeId, accent) {
     selectedTheme = themeId;
     themeCards.forEach(c => {
       if (c.getAttribute('data-theme-id') === themeId) {
@@ -551,21 +581,36 @@ document.addEventListener('DOMContentLoaded', async () => {
         c.classList.remove('active');
       }
     });
+    if (accent) {
+      accentPicker.value = accent;
+      accentInput.value = accent;
+      if (window.M3Theme) {
+        window.M3Theme.applyDynamicTokens(accent, selectedMode);
+      }
+    }
   }
 
   themeCards.forEach(card => {
     card.addEventListener('click', () => {
-      selectThemeCard(card.getAttribute('data-theme-id'));
+      const themeId = card.getAttribute('data-theme-id');
+      const accent = card.getAttribute('data-accent');
+      selectThemeCard(themeId, accent);
     });
   });
 
   accentPicker.addEventListener('input', (e) => {
     accentInput.value = e.target.value;
+    if (window.M3Theme) {
+      window.M3Theme.applyDynamicTokens(e.target.value, selectedMode);
+    }
   });
 
   accentInput.addEventListener('input', (e) => {
     if (/^#[0-9A-Fa-f]{6}$/.test(e.target.value)) {
       accentPicker.value = e.target.value;
+      if (window.M3Theme) {
+        window.M3Theme.applyDynamicTokens(e.target.value, selectedMode);
+      }
     }
   });
 
@@ -585,7 +630,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const payload = {
       ...currentProfile,
       theme: selectedTheme,
-      accent_color: accentInput.value.trim() || '#6366f1',
+      accent_color: accentInput.value.trim() || '#818cf8',
+      color_mode: selectedMode,
       background_type: bgTypeSelect.value,
       background_value: bgValueInput.value.trim()
     };
@@ -598,7 +644,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       if (res.ok) {
         currentProfile = payload;
-        showToast('Appearance settings saved! 🎨');
+        showToast('Dynamic appearance settings saved! 🎨✨');
       } else {
         showToast('Failed to save appearance', true);
       }

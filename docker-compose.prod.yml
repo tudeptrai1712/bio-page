@@ -1,6 +1,6 @@
 services:
   bio-page:
-    build: .
+    image: ghcr.io/tudeptrai1712/bio-page:latest
     container_name: bio-page
     restart: unless-stopped
     ports:
@@ -30,3 +30,15 @@ services:
       - "6379:6379"
     volumes:
       - ./data/redis:/data
+
+  # Automatic Update Agent (Pulls new images from GHCR on new GitHub releases/pushes)
+  watchtower:
+    image: containrrr/watchtower
+    container_name: bio-watchtower
+    restart: unless-stopped
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=300 # Checks for new GitHub releases every 5 minutes
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+

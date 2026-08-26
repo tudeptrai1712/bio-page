@@ -1,5 +1,6 @@
 /* ==========================================================================
-   MATERIAL 3 EXPRESSIVE DESIGN SYSTEM & MOTION TOKENS
+   MATERIAL 3 EXPRESSIVE DESIGN SYSTEM & MOTION PHYSICS TOKENS
+   Inspired by Android Dynamic Color (Monet) & Material 3 Expressive
    ========================================================================== */
 
 :root {
@@ -7,17 +8,19 @@
   --m3-font-brand: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --m3-font-plain: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
-  /* Material 3 Expressive Motion Tokens */
-  --m3-motion-duration-short: 200ms;
-  --m3-motion-duration-medium: 400ms;
+  /* Material 3 Expressive Motion Physics Tokens */
+  --m3-motion-duration-short: 180ms;
+  --m3-motion-duration-medium: 380ms;
   --m3-motion-duration-long: 650ms;
-  --m3-motion-easing-emphasized: cubic-bezier(0.2, 0.0, 0.0, 1.0);
-  --m3-motion-easing-emphasized-decel: cubic-bezier(0.05, 0.7, 0.1, 1.0);
-  --m3-motion-easing-emphasized-accel: cubic-bezier(0.3, 0.0, 0.8, 0.15);
-  --m3-motion-easing-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-  --m3-motion-easing-standard: cubic-bezier(0.2, 0.0, 0, 1.0);
 
-  /* Material 3 Expressive Shape Tokens */
+  /* Physics Spring Easing Curves */
+  --m3-motion-spring-bouncy: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --m3-motion-spring-snappy: cubic-bezier(0.2, 0.0, 0, 1.0);
+  --m3-motion-spring-expressive: cubic-bezier(0.05, 0.7, 0.1, 1.0);
+  --m3-motion-spring-gentle: cubic-bezier(0.16, 1, 0.3, 1);
+  --m3-motion-easing-emphasized: cubic-bezier(0.2, 0.0, 0.0, 1.0);
+
+  /* Shape Tokens */
   --m3-shape-corner-none: 0px;
   --m3-shape-corner-extra-small: 6px;
   --m3-shape-corner-small: 10px;
@@ -26,162 +29,72 @@
   --m3-shape-corner-extra-large: 32px;
   --m3-shape-corner-full: 9999px;
 
-  /* Default Theme: Obsidian / Violet Expressive */
-  --m3-sys-color-primary: #a87ffb;
-  --m3-sys-color-on-primary: #380072;
-  --m3-sys-color-primary-container: #50139b;
-  --m3-sys-color-on-primary-container: #eedcff;
-
-  --m3-sys-color-secondary: #70d6ff;
-  --m3-sys-color-on-secondary: #003548;
-  --m3-sys-color-secondary-container: #004d67;
-  --m3-sys-color-on-secondary-container: #c4e7ff;
-
-  --m3-sys-color-tertiary: #ff70a6;
-  --m3-sys-color-on-tertiary: #5f002b;
-  --m3-sys-color-tertiary-container: #83003f;
-  --m3-sys-color-on-tertiary-container: #ffd9e2;
-
-  --m3-sys-color-background: #0f111a;
-  --m3-sys-color-on-background: #e2e1ec;
-  --m3-sys-color-surface: #141724;
-  --m3-sys-color-on-surface: #e2e1ec;
-  --m3-sys-color-on-surface-variant: #a5a4b4;
-
-  /* Surface Container Hierarchy */
-  --m3-sys-color-surface-container-lowest: #0a0b12;
-  --m3-sys-color-surface-container-low: #121522;
-  --m3-sys-color-surface-container: #181c2d;
-  --m3-sys-color-surface-container-high: #21263c;
-  --m3-sys-color-surface-container-highest: #2b314c;
-
-  --m3-sys-color-outline: rgba(255, 255, 255, 0.12);
-  --m3-sys-color-outline-variant: rgba(255, 255, 255, 0.06);
-
-  /* Expressive Glows & Shadows */
-  --m3-elevation-1: 0px 2px 8px rgba(0, 0, 0, 0.3);
-  --m3-elevation-2: 0px 8px 24px rgba(0, 0, 0, 0.45);
-  --m3-elevation-3: 0px 16px 40px rgba(0, 0, 0, 0.6);
-  --m3-glow-primary: rgba(168, 127, 251, 0.35);
-  --m3-glow-secondary: rgba(112, 214, 255, 0.25);
-
-  --bg-gradient: radial-gradient(circle at 50% -20%, #291a45 0%, #0f111a 70%);
-}
-
-/* ==========================================================================
-   THEME PALETTES (M3 EXPRESSIVE DYNAMIC TONAL PRESETS)
-   ========================================================================== */
-
-/* 1. Midnight Cyber-Glass */
-body[data-theme="midnight"] {
+  /* Dynamic Tonal Colors (Default Dark Fallback) */
   --m3-sys-color-primary: #818cf8;
   --m3-sys-color-on-primary: #1e1b4b;
   --m3-sys-color-primary-container: #3730a3;
   --m3-sys-color-on-primary-container: #e0e7ff;
   --m3-sys-color-secondary: #38bdf8;
+  --m3-sys-color-on-secondary: #082f49;
+  --m3-sys-color-secondary-container: #0369a1;
+  --m3-sys-color-on-secondary-container: #e0f2fe;
   --m3-sys-color-background: #090d16;
+  --m3-sys-color-on-background: #f1f5f9;
   --m3-sys-color-surface: #0f172a;
-  --m3-sys-color-surface-container: #1e293b;
-  --m3-sys-color-surface-container-high: #28344e;
-  --m3-sys-color-surface-container-highest: #334155;
+  --m3-sys-color-surface-container: #181c2d;
+  --m3-sys-color-surface-container-high: #21263c;
+  --m3-sys-color-surface-container-highest: #2e354f;
+  --m3-sys-color-on-surface: #ffffff;
+  --m3-sys-color-on-surface-variant: #cbd5e1;
+  --m3-sys-color-outline: rgba(255, 255, 255, 0.12);
+  --m3-sys-color-outline-variant: rgba(255, 255, 255, 0.06);
   --m3-glow-primary: rgba(129, 140, 248, 0.35);
+
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.06);
+  --card-text: #1e293b;
+  --card-hover-bg: #f8fafc;
+  --card-hover-border: var(--m3-sys-color-primary);
+  --card-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+
+  --topbar-btn-bg: #ffffff;
+  --topbar-btn-color: #1e293b;
+
+  --bg-color: #090d16;
   --bg-gradient: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #090d16 80%);
-}
 
-/* 2. Glass Ocean / Cyan */
-body[data-theme="glass"] {
-  --m3-sys-color-primary: #38bdf8;
-  --m3-sys-color-on-primary: #082f49;
-  --m3-sys-color-primary-container: #0369a1;
-  --m3-sys-color-on-primary-container: #e0f2fe;
-  --m3-sys-color-secondary: #2dd4bf;
-  --m3-sys-color-background: #061826;
-  --m3-sys-color-surface: #0b2238;
-  --m3-sys-color-surface-container: #0f2e4a;
-  --m3-sys-color-surface-container-high: #153c61;
-  --m3-sys-color-surface-container-highest: #1e4d7a;
-  --m3-glow-primary: rgba(56, 189, 248, 0.35);
-  --bg-gradient: radial-gradient(circle at 50% -10%, #075985 0%, #061826 80%);
-}
-
-/* 3. Sunset Berry / Magenta */
-body[data-theme="sunset"] {
-  --m3-sys-color-primary: #fb7185;
-  --m3-sys-color-on-primary: #4c0519;
-  --m3-sys-color-primary-container: #9f1239;
-  --m3-sys-color-on-primary-container: #ffe4e6;
-  --m3-sys-color-secondary: #f472b6;
-  --m3-sys-color-background: #190914;
-  --m3-sys-color-surface: #260f20;
-  --m3-sys-color-surface-container: #38152e;
-  --m3-sys-color-surface-container-high: #4d1c40;
-  --m3-sys-color-surface-container-highest: #662453;
-  --m3-glow-primary: rgba(251, 113, 133, 0.35);
-  --bg-gradient: radial-gradient(circle at 50% -10%, #831843 0%, #190914 85%);
-}
-
-/* 4. Cyberpunk Neon */
-body[data-theme="cyberpunk"] {
-  --m3-sys-color-primary: #06b6d4;
-  --m3-sys-color-on-primary: #000000;
-  --m3-sys-color-primary-container: #0891b2;
-  --m3-sys-color-on-primary-container: #cffafe;
-  --m3-sys-color-secondary: #f43f5e;
-  --m3-sys-color-background: #050508;
-  --m3-sys-color-surface: #0d0e15;
-  --m3-sys-color-surface-container: #151722;
-  --m3-sys-color-surface-container-high: #202334;
-  --m3-sys-color-surface-container-highest: #2d3047;
-  --m3-shape-corner-large: 12px;
-  --m3-shape-corner-extra-large: 16px;
-  --m3-glow-primary: rgba(6, 182, 212, 0.4);
-  --bg-gradient: radial-gradient(circle at 50% 0%, #0e3b43 0%, #050508 85%);
-}
-
-/* 5. Emerald Forest */
-body[data-theme="emerald"] {
-  --m3-sys-color-primary: #34d399;
-  --m3-sys-color-on-primary: #022c22;
-  --m3-sys-color-primary-container: #065f46;
-  --m3-sys-color-on-primary-container: #d1fae5;
-  --m3-sys-color-secondary: #6ee7b7;
-  --m3-sys-color-background: #041610;
-  --m3-sys-color-surface: #0a241c;
-  --m3-sys-color-surface-container: #103429;
-  --m3-sys-color-surface-container-high: #174537;
-  --m3-sys-color-surface-container-highest: #225a49;
-  --m3-glow-primary: rgba(52, 211, 153, 0.35);
-  --bg-gradient: radial-gradient(circle at 50% -10%, #064e3b 0%, #041610 80%);
-}
-
-/* 6. Clean Expressive Light */
-body[data-theme="light"] {
-  --m3-sys-color-primary: #6366f1;
-  --m3-sys-color-on-primary: #ffffff;
-  --m3-sys-color-primary-container: #e0e7ff;
-  --m3-sys-color-on-primary-container: #3730a3;
-  --m3-sys-color-secondary: #0284c7;
-  --m3-sys-color-background: #f8fafc;
-  --m3-sys-color-on-background: #0f172a;
-  --m3-sys-color-surface: #ffffff;
-  --m3-sys-color-on-surface: #0f172a;
-  --m3-sys-color-on-surface-variant: #64748b;
-  --m3-sys-color-surface-container: #f1f5f9;
-  --m3-sys-color-surface-container-high: #e2e8f0;
-  --m3-sys-color-surface-container-highest: #cbd5e1;
-  --m3-sys-color-outline: rgba(0, 0, 0, 0.08);
-  --m3-sys-color-outline-variant: rgba(0, 0, 0, 0.04);
-  --m3-elevation-1: 0px 4px 12px rgba(0, 0, 0, 0.06);
-  --m3-elevation-2: 0px 10px 28px rgba(0, 0, 0, 0.1);
-  --m3-elevation-3: 0px 20px 45px rgba(0, 0, 0, 0.14);
-  --m3-glow-primary: rgba(99, 102, 241, 0.18);
-  --bg-gradient: radial-gradient(circle at 50% 0%, #e0e7ff 0%, #f8fafc 70%);
+  --m3-elevation-1: 0px 4px 12px rgba(0, 0, 0, 0.08);
+  --m3-elevation-2: 0px 8px 24px rgba(0, 0, 0, 0.15);
+  --m3-elevation-3: 0px 16px 36px rgba(0, 0, 0, 0.25);
 }
 
 /* ==========================================================================
-   GLOBAL RESET & EXPRESSIVE BASE STYLES
+   THEMES & CLIENT DARK/LIGHT ADAPTATION
    ========================================================================== */
 
+body[data-color-mode="dark"] {
+  --card-bg: var(--m3-sys-color-surface-container);
+  --card-border: var(--m3-sys-color-outline);
+  --card-text: var(--m3-sys-color-on-surface);
+  --card-hover-bg: var(--m3-sys-color-surface-container-high);
+  --card-hover-border: var(--m3-sys-color-primary);
+  --card-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --topbar-btn-bg: var(--m3-sys-color-surface-container);
+  --topbar-btn-color: var(--m3-sys-color-on-surface);
+}
+
+body[data-color-mode="light"] {
+  --card-bg: #ffffff;
+  --card-border: rgba(0, 0, 0, 0.08);
+  --card-text: #0f172a;
+  --card-hover-bg: #f8fafc;
+  --card-hover-border: var(--m3-sys-color-primary);
+  --card-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  --topbar-btn-bg: #ffffff;
+  --topbar-btn-color: #0f172a;
+}
+
+/* Base resets */
 * {
   margin: 0;
   padding: 0;
@@ -202,39 +115,27 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding: 32px 16px 64px 16px;
+  padding: 24px 16px 64px 16px;
   position: relative;
   overflow-x: hidden;
+  transition: background-color var(--m3-motion-duration-medium) var(--m3-motion-spring-gentle),
+              color var(--m3-motion-duration-medium) var(--m3-motion-spring-gentle);
 }
 
-/* Expressive Animated Morphing Background Blobs */
+/* Ambient Morphing Physics Background Blobs */
 .bg-blob-1 {
   position: fixed;
-  width: 500px;
-  height: 500px;
+  width: 540px;
+  height: 540px;
   border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
   background: radial-gradient(circle, var(--m3-glow-primary) 0%, rgba(0, 0, 0, 0) 70%);
-  top: -120px;
+  top: -140px;
   left: 50%;
   transform: translateX(-50%);
   pointer-events: none;
   z-index: 0;
-  filter: blur(50px);
+  filter: blur(55px);
   animation: blobMorph 16s ease-in-out infinite alternate;
-}
-
-.bg-blob-2 {
-  position: fixed;
-  width: 450px;
-  height: 450px;
-  border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
-  background: radial-gradient(circle, var(--m3-glow-secondary) 0%, rgba(0, 0, 0, 0) 70%);
-  bottom: -100px;
-  right: -50px;
-  pointer-events: none;
-  z-index: 0;
-  filter: blur(60px);
-  animation: blobMorph 20s ease-in-out infinite alternate-reverse;
 }
 
 @keyframes blobMorph {
@@ -244,7 +145,7 @@ body {
   }
   50% {
     border-radius: 70% 30% 50% 50% / 30% 60% 40% 70%;
-    transform: translateX(-45%) rotate(180deg) scale(1.1);
+    transform: translateX(-46%) rotate(180deg) scale(1.08);
   }
   100% {
     border-radius: 50% 50% 30% 70% / 55% 40% 60% 45%;
@@ -253,383 +154,334 @@ body {
 }
 
 /* ==========================================================================
-   EXPRESSIVE BIO CONTAINER
+   PAGE WRAPPER & TOPBAR (EXACT REFERENCE DESIGN)
    ========================================================================== */
 
-.bio-container {
+.bio-wrapper {
   width: 100%;
-  max-width: 560px;
+  max-width: 480px;
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   margin: 0 auto;
-}
-
-/* Expressive Entrance Animation */
-.m3-animate-in {
-  opacity: 0;
-  transform: translateY(28px) scale(0.97);
-  animation: m3Enter 0.65s var(--m3-motion-easing-emphasized-decel) forwards;
+  animation: m3Enter 0.6s var(--m3-motion-spring-expressive) forwards;
 }
 
 @keyframes m3Enter {
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(24px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* ==========================================================================
-   TOP ACTIONS PILL BAR
-   ========================================================================== */
-
-.top-actions-bar {
+.topbar-nav {
   width: 100%;
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
-  margin-bottom: 20px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
 }
 
-.m3-action-btn {
-  background: var(--m3-sys-color-surface-container);
-  border: 1px solid var(--m3-sys-color-outline);
-  color: var(--m3-sys-color-on-surface);
+.topbar-icon-btn {
   width: 44px;
   height: 44px;
   border-radius: var(--m3-shape-corner-full);
+  background: var(--topbar-btn-bg);
+  border: 1px solid var(--m3-sys-color-outline);
+  color: var(--topbar-btn-color);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-size: 1.15rem;
   cursor: pointer;
-  backdrop-filter: blur(16px);
   box-shadow: var(--m3-elevation-1);
-  transition: all var(--m3-motion-duration-short) var(--m3-motion-easing-spring);
+  backdrop-filter: blur(16px);
+  transition: transform var(--m3-motion-duration-short) var(--m3-motion-spring-bouncy),
+              background var(--m3-motion-duration-short) ease,
+              box-shadow var(--m3-motion-duration-short) ease;
   text-decoration: none;
   position: relative;
   overflow: hidden;
 }
 
-.m3-action-btn:hover {
-  background: var(--m3-sys-color-surface-container-high);
+.topbar-icon-btn:hover {
+  transform: translateY(-2px) scale(1.1);
+  box-shadow: var(--m3-elevation-2), 0 0 16px var(--m3-glow-primary);
   border-color: var(--m3-sys-color-primary);
   color: var(--m3-sys-color-primary);
-  transform: translateY(-2px) scale(1.08);
-  box-shadow: var(--m3-elevation-2), 0 0 16px var(--m3-glow-primary);
 }
 
-.m3-action-btn:active {
-  transform: translateY(0) scale(0.95);
+.topbar-icon-btn:active {
+  transform: scale(0.92);
 }
 
 /* ==========================================================================
-   PROFILE HERO (M3 EXPRESSIVE BENTO CARD)
+   PROFILE HEADER (AVATAR, HANDLE & DIRECT CONTACT BAR)
    ========================================================================== */
 
-.profile-hero {
-  width: 100%;
-  background: var(--m3-sys-color-surface-container);
-  border: 1px solid var(--m3-sys-color-outline);
-  border-radius: var(--m3-shape-corner-extra-large);
-  padding: 32px 24px;
+.profile-center {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  margin-bottom: 20px;
-  backdrop-filter: blur(20px);
-  box-shadow: var(--m3-elevation-2);
+  margin-bottom: 22px;
+  width: 100%;
+}
+
+.avatar-circle-wrapper {
   position: relative;
-  overflow: hidden;
-  transition: transform var(--m3-motion-duration-medium) var(--m3-motion-easing-emphasized),
-              box-shadow var(--m3-motion-duration-medium) var(--m3-motion-easing-emphasized);
+  width: 100px;
+  height: 100px;
+  margin-bottom: 16px;
+  perspective: 600px;
 }
 
-.profile-hero:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--m3-elevation-3), 0 0 30px var(--m3-glow-primary);
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Expressive Avatar with Pulsing Glowing Ring */
-.avatar-frame {
-  position: relative;
-  width: 116px;
-  height: 116px;
-  margin-bottom: 20px;
-}
-
-.avatar-ring {
-  position: absolute;
-  inset: -4px;
-  border-radius: var(--m3-shape-corner-full);
-  background: linear-gradient(135deg, var(--m3-sys-color-primary), var(--m3-sys-color-secondary));
-  opacity: 0.85;
-  animation: ringRotate 8s linear infinite;
-}
-
-@keyframes ringRotate {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.avatar-img {
-  position: relative;
+.avatar-image {
   width: 100%;
   height: 100%;
   border-radius: var(--m3-shape-corner-full);
   object-fit: cover;
-  border: 3px solid var(--m3-sys-color-surface-container);
+  border: 2px solid rgba(255, 255, 255, 0.9);
   box-shadow: var(--m3-elevation-2);
-  transition: transform var(--m3-motion-duration-medium) var(--m3-motion-easing-spring);
-  z-index: 1;
+  transition: transform var(--m3-motion-duration-medium) var(--m3-motion-spring-bouncy);
 }
 
-.avatar-frame:hover .avatar-img {
-  transform: scale(1.06);
+.avatar-circle-wrapper:hover .avatar-image {
+  transform: scale(1.08) rotate(3deg);
+  box-shadow: var(--m3-elevation-3), 0 0 24px var(--m3-glow-primary);
 }
 
-.avatar-placeholder {
-  position: relative;
+.avatar-fallback {
   width: 100%;
   height: 100%;
   border-radius: var(--m3-shape-corner-full);
   background: linear-gradient(135deg, var(--m3-sys-color-primary), var(--m3-sys-color-secondary));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.8rem;
-  font-weight: 800;
-  font-family: var(--m3-font-brand);
   color: #ffffff;
-  border: 3px solid var(--m3-sys-color-surface-container);
-  box-shadow: var(--m3-elevation-2);
-  z-index: 1;
-}
-
-/* Typography & Badges */
-.profile-title {
-  font-family: var(--m3-font-brand);
-  font-size: 1.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
   font-weight: 800;
-  letter-spacing: -0.5px;
+  font-family: var(--m3-font-brand);
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  box-shadow: var(--m3-elevation-2);
+}
+
+.profile-display-name {
+  font-family: var(--m3-font-brand);
+  font-size: 1.4rem;
+  font-weight: 800;
   color: var(--m3-sys-color-on-surface);
-  margin-bottom: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+  letter-spacing: -0.3px;
+  margin-bottom: 2px;
+  line-height: 1.2;
 }
 
-.verified-chip {
-  color: var(--m3-sys-color-primary);
-  font-size: 1.15rem;
-  display: inline-flex;
-}
-
-.profile-handle-chip {
-  display: inline-flex;
-  align-items: center;
-  background: var(--m3-sys-color-primary-container);
-  color: var(--m3-sys-color-on-primary-container);
-  padding: 4px 14px;
-  border-radius: var(--m3-shape-corner-full);
-  font-size: 0.85rem;
-  font-weight: 700;
-  margin-bottom: 12px;
-  box-shadow: var(--m3-elevation-1);
-}
-
-.profile-tagline {
-  font-size: 1.05rem;
+.profile-username {
+  font-size: 0.95rem;
   font-weight: 600;
-  color: var(--m3-sys-color-on-surface);
-  margin-bottom: 10px;
-  line-height: 1.4;
-}
-
-.profile-bio {
-  font-size: 0.94rem;
-  line-height: 1.6;
   color: var(--m3-sys-color-on-surface-variant);
-  max-width: 480px;
-  margin-bottom: 22px;
+  letter-spacing: -0.2px;
+  margin-bottom: 8px;
 }
 
-/* ==========================================================================
-   SOCIAL MEDIA EXPRESSIVE CHIPS
-   ========================================================================== */
-
-.social-chips-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
+.profile-bio-text {
+  font-size: 0.92rem;
+  color: var(--m3-sys-color-on-surface-variant);
+  max-width: 440px;
+  line-height: 1.5;
+  margin-bottom: 12px;
 }
 
-.social-chip {
-  width: 46px;
-  height: 46px;
-  border-radius: var(--m3-shape-corner-large);
-  background: var(--m3-sys-color-surface-container-high);
-  border: 1px solid var(--m3-sys-color-outline);
-  color: var(--m3-sys-color-on-surface);
+/* Direct Contact Detail Icons (under handle) */
+.contact-details-bar {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  gap: 12px;
+  margin-top: 4px;
+  margin-bottom: 6px;
+}
+
+.contact-icon-pill {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--m3-shape-corner-full);
+  background: var(--topbar-btn-bg);
+  color: var(--topbar-btn-color);
+  border: 1px solid var(--m3-sys-color-outline);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
   text-decoration: none;
-  box-shadow: var(--m3-elevation-1);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.12);
+  transition: transform var(--m3-motion-duration-short) var(--m3-motion-spring-bouncy),
+              background var(--m3-motion-duration-short) ease,
+              color var(--m3-motion-duration-short) ease,
+              box-shadow var(--m3-motion-duration-short) ease;
   position: relative;
   overflow: hidden;
-  transition: all var(--m3-motion-duration-short) var(--m3-motion-easing-spring);
 }
 
-.social-chip:hover {
+.contact-icon-pill:hover {
   background: var(--m3-sys-color-primary);
-  color: var(--m3-sys-color-on-primary);
+  color: #ffffff;
   border-color: var(--m3-sys-color-primary);
-  transform: translateY(-4px) scale(1.12);
-  box-shadow: var(--m3-elevation-2), 0 0 20px var(--m3-glow-primary);
-  border-radius: var(--m3-shape-corner-full);
+  transform: translateY(-3px) scale(1.15);
+  box-shadow: 0 8px 20px var(--m3-glow-primary);
 }
 
-.social-chip:active {
-  transform: translateY(0) scale(0.95);
+.contact-icon-pill:active {
+  transform: scale(0.92);
 }
 
 /* ==========================================================================
-   EXPRESSIVE LINK CARDS
+   CUSTOM LINKS & SOCIAL LINKS (PHYSICS INTERACTION & CLEAN CARDS)
    ========================================================================== */
 
-.links-stack {
+.links-list-container {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
 }
 
-.m3-card-link {
+.bio-link-card {
   position: relative;
   display: flex;
   align-items: center;
-  background: var(--m3-sys-color-surface-container);
-  border: 1px solid var(--m3-sys-color-outline);
-  border-radius: var(--m3-shape-corner-large);
-  padding: 16px 20px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--m3-shape-corner-small);
+  padding: 18px 22px;
   text-decoration: none;
-  color: var(--m3-sys-color-on-surface);
-  backdrop-filter: blur(16px);
-  box-shadow: var(--m3-elevation-1);
-  transition: transform var(--m3-motion-duration-medium) var(--m3-motion-easing-spring),
+  color: var(--card-text);
+  box-shadow: var(--card-shadow);
+  transition: transform var(--m3-motion-duration-short) var(--m3-motion-spring-bouncy),
+              box-shadow var(--m3-motion-duration-short) ease,
               background var(--m3-motion-duration-short) ease,
-              border-color var(--m3-motion-duration-short) ease,
-              box-shadow var(--m3-motion-duration-medium) ease,
-              border-radius var(--m3-motion-duration-medium) ease;
-  overflow: hidden;
+              border-color var(--m3-motion-duration-short) ease;
   cursor: pointer;
+  overflow: visible;
 }
 
-.m3-card-link:hover {
-  background: var(--m3-sys-color-surface-container-highest);
+.bio-link-card:hover {
+  background: var(--card-hover-bg);
   border-color: var(--m3-sys-color-primary);
-  transform: translateY(-3px) scale(1.015);
-  box-shadow: var(--m3-elevation-3), 0 0 24px var(--m3-glow-primary);
-  border-radius: var(--m3-shape-corner-extra-large);
+  transform: translateY(-2px);
+  box-shadow: var(--m3-elevation-2), 0 0 16px var(--m3-glow-primary);
 }
 
-.m3-card-link:active {
+.bio-link-card:active {
   transform: translateY(0) scale(0.985);
 }
 
-/* Expressive Featured / Highlighted Card */
-.m3-card-link.highlighted {
-  border-color: var(--m3-sys-color-primary);
-  background: linear-gradient(135deg, var(--m3-sys-color-primary-container) 0%, var(--m3-sys-color-surface-container) 100%);
-  box-shadow: var(--m3-elevation-2), 0 0 20px var(--m3-glow-primary);
-  animation: pulseGlow 4s ease-in-out infinite alternate;
+.bio-link-card.highlighted {
+  border-left: 4px solid var(--m3-sys-color-primary);
+  box-shadow: var(--m3-elevation-2), 0 0 16px var(--m3-glow-primary);
 }
 
-@keyframes pulseGlow {
-  0% { box-shadow: var(--m3-elevation-2), 0 0 10px var(--m3-glow-primary); }
-  100% { box-shadow: var(--m3-elevation-3), 0 0 28px var(--m3-glow-primary); }
-}
-
-/* Icon Tonal Bubble */
-.link-tonal-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--m3-shape-corner-medium);
-  background: var(--m3-sys-color-surface-container-high);
-  color: var(--m3-sys-color-primary);
+.card-icon-area {
+  font-size: 1.35rem;
+  width: 32px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-  margin-right: 16px;
+  justify-content: flex-start;
+  color: var(--card-text);
   flex-shrink: 0;
-  transition: all var(--m3-motion-duration-short) var(--m3-motion-easing-spring);
+  transition: transform var(--m3-motion-duration-short) var(--m3-motion-spring-bouncy);
 }
 
-.m3-card-link:hover .link-tonal-icon {
-  background: var(--m3-sys-color-primary);
-  color: var(--m3-sys-color-on-primary);
-  transform: scale(1.1) rotate(-6deg);
-  border-radius: var(--m3-shape-corner-full);
+.bio-link-card:hover .card-icon-area {
+  transform: scale(1.15) rotate(-5deg);
+  color: var(--m3-sys-color-primary);
 }
 
-.link-content-box {
+.card-title-area {
   flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.link-headline {
+  text-align: center;
   font-family: var(--m3-font-brand);
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--m3-sys-color-on-surface);
-  margin-bottom: 2px;
+  color: var(--card-text);
+  letter-spacing: -0.2px;
+  padding: 0 12px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.link-subhead {
-  font-size: 0.84rem;
-  color: var(--m3-sys-color-on-surface-variant);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.link-arrow-circle {
-  width: 36px;
-  height: 36px;
+.card-action-dots {
+  width: 32px;
+  height: 32px;
   border-radius: var(--m3-shape-corner-full);
-  background: var(--m3-sys-color-surface-container-low);
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--m3-sys-color-on-surface-variant);
-  font-size: 0.9rem;
-  margin-left: 12px;
+  font-size: 1.15rem;
+  cursor: pointer;
+  transition: all var(--m3-motion-duration-short) var(--m3-motion-spring-bouncy);
   flex-shrink: 0;
-  transition: all var(--m3-motion-duration-short) var(--m3-motion-easing-spring);
 }
 
-.m3-card-link:hover .link-arrow-circle {
+.card-action-dots:hover {
+  color: var(--m3-sys-color-primary);
+  background: var(--m3-sys-color-outline-variant);
+  transform: scale(1.15);
+}
+
+/* 3-dots Dropdown Context Menu */
+.card-context-menu {
+  position: absolute;
+  right: 12px;
+  top: calc(100% + 6px);
+  background: var(--m3-sys-color-surface-container-highest);
+  border: 1px solid var(--m3-sys-color-outline);
+  border-radius: var(--m3-shape-corner-medium);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.35);
+  padding: 6px;
+  display: none;
+  flex-direction: column;
+  min-width: 145px;
+  z-index: 100;
+  backdrop-filter: blur(16px);
+  animation: menuSpring 0.22s var(--m3-motion-spring-bouncy) forwards;
+}
+
+.card-context-menu.open {
+  display: flex;
+}
+
+@keyframes menuSpring {
+  from { opacity: 0; transform: translateY(-8px) scale(0.92); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.menu-item-btn {
+  background: transparent;
+  border: none;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--m3-sys-color-on-surface);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.menu-item-btn:hover {
   background: var(--m3-sys-color-primary);
-  color: var(--m3-sys-color-on-primary);
-  transform: translateX(4px);
+  color: #ffffff;
 }
 
 /* ==========================================================================
-   RIPPLE EFFECT (M3 STATE LAYER)
+   DYNAMIC M3 STATE RIPPLE PHYSICS
    ========================================================================== */
 
 .m3-ripple-surface {
@@ -637,16 +489,16 @@ body {
   overflow: hidden;
 }
 
-.m3-ripple {
+.m3-ripple-layer {
   position: absolute;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.25);
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.05) 80%);
   transform: scale(0);
-  animation: rippleAnimation 0.6s linear;
+  animation: dynamicRipple 0.65s var(--m3-motion-spring-expressive) forwards;
   pointer-events: none;
 }
 
-@keyframes rippleAnimation {
+@keyframes dynamicRipple {
   to {
     transform: scale(4);
     opacity: 0;
@@ -654,51 +506,38 @@ body {
 }
 
 /* ==========================================================================
-   FOOTER & FLOATING TOAST
+   FOOTER & TOAST NOTIFICATION
    ========================================================================== */
 
-.m3-footer {
-  margin-top: 48px;
+.bio-page-footer {
+  margin-top: 44px;
   text-align: center;
-  font-size: 0.88rem;
+  font-size: 0.85rem;
   color: var(--m3-sys-color-on-surface-variant);
 }
 
-.m3-toast {
+.bio-toast {
   position: fixed;
   bottom: 28px;
   background: var(--m3-sys-color-surface-container-highest);
-  border: 1px solid var(--m3-sys-color-primary);
   color: var(--m3-sys-color-on-surface);
+  border: 1px solid var(--m3-sys-color-primary);
   padding: 12px 24px;
   border-radius: var(--m3-shape-corner-full);
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 600;
   box-shadow: var(--m3-elevation-3), 0 0 20px var(--m3-glow-primary);
   z-index: 9999;
   opacity: 0;
-  transform: translateY(20px) scale(0.9);
-  transition: all var(--m3-motion-duration-medium) var(--m3-motion-easing-spring);
+  transform: translateY(24px) scale(0.92);
+  transition: all var(--m3-motion-duration-medium) var(--m3-motion-spring-bouncy);
   pointer-events: none;
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.m3-toast.show {
+.bio-toast.show {
   opacity: 1;
   transform: translateY(0) scale(1);
-}
-
-/* Skeleton Loading Shimmer */
-.m3-skeleton {
-  background: linear-gradient(90deg, var(--m3-sys-color-surface-container) 25%, var(--m3-sys-color-surface-container-high) 50%, var(--m3-sys-color-surface-container) 75%);
-  background-size: 200% 100%;
-  animation: m3Shimmer 1.8s infinite;
-  border-radius: var(--m3-shape-corner-large);
-}
-
-@keyframes m3Shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
 }

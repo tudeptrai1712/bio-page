@@ -60,6 +60,17 @@ A high-performance, modern, self-hosted link-in-bio page (alternative to Linktre
 
 ---
 
+## 🔄 Resetting / Overriding Admin Password
+
+If you ever forget your admin password or need to reset it via CLI:
+
+```bash
+# Set a new password directly (e.g. "MyNewSecretPassword")
+docker exec -it bio-page node -e "const bcrypt = require('bcryptjs'); const { db } = require('./src/db'); db.prepare('UPDATE users SET password_hash = ? WHERE id = 1').run(bcrypt.hashSync('MyNewSecretPassword', 10)); console.log('Password reset successfully!');"
+```
+
+---
+
 ## 📂 Persistent Data & Backups
 
 All data is stored inside `./data`:
