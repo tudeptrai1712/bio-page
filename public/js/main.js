@@ -18,6 +18,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Avatar image error fallback
+  const avatarImg = document.getElementById('profile-avatar-img');
+  if (avatarImg) {
+    avatarImg.addEventListener('error', function() {
+      const handle = this.getAttribute('alt') || 'U';
+      const initial = handle.replace('@', '').trim().charAt(0).toUpperCase() || 'U';
+      if (this.parentNode) {
+        this.parentNode.innerHTML = `<div class="avatar-fallback">${initial}</div>`;
+      }
+    });
+  }
+
   // Close context menus when clicking outside
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.card-action-dots') && !e.target.closest('.card-context-menu')) {

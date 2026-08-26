@@ -10,9 +10,38 @@ const {
 } = require('../redis');
 const { publicRateLimiter } = require('../middleware/rateLimit');
 const { Logger } = require('../logger');
+const { generateThemeCss } = require('../renderer');
 
 // Apply public rate limiter (120 req/min - ASVS V13)
 router.use(publicRateLimiter);
+
+// Dynamic Theme CSS (served as external CSS file for strict CSP Level 3)
+router.get('/theme.css', async (req, res) => {
+  try {
+    const cachedCss = await getCache('bio:theme_css');
+    if (cachedCss) {
+      res.setHeader('Content-Type', 'text/css; charset=utf-8');
+      res.setHeader('Cache-Control', 'public, max-age=600');
+      return res.send(cachedCss);
+    }
+
+    const profile = db.prepare('SELECT accent_color, color_mode, background_type, background_value FROM profile WHERE id = 1').get() || {};
+    const css = generateThemeCss(
+      profile.accent_color || '#818cf8',
+      profile.color_mode || 'auto',
+      profile.background_type || 'preset',
+      profile.background_value || ''
+    );
+
+    await setCache('bio:theme_css', css, 600);
+    res.setHeader('Content-Type', 'text/css; charset=utf-8');
+    res.setHeader('Cache-Control', 'public, max-age=600');
+    res.send(css);
+  } catch (err) {
+    res.setHeader('Content-Type', 'text/css; charset=utf-8');
+    res.send(':root { --m3-sys-color-primary: #818cf8; }');
+  }
+});
 
 // Get full bio page public profile (with Redis caching)
 router.get('/profile', async (req, res) => {
