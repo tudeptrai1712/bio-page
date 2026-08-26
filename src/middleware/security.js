@@ -17,11 +17,11 @@ function isRequestHttps(req) {
 function securityHeadersMiddleware(req, res, next) {
   const isHttps = isRequestHttps(req);
 
-  // Content Security Policy
+  // Content Security Policy (OWASP ASVS Level 3 Compliance - Zero unsafe-inline)
   const cspDirectives = [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://unpkg.com https://cdnjs.cloudflare.com",
-    "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com",
+    "script-src 'self' https://unpkg.com https://cdnjs.cloudflare.com",
+    "style-src 'self' https://cdnjs.cloudflare.com https://fonts.googleapis.com",
     "font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com data:",
     "img-src 'self' data: https: blob:",
     "connect-src 'self'",

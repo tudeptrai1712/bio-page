@@ -2,6 +2,7 @@
  * Server-Side Renderer (SSR) for Self-Hosted Bio Page
  * Performs 100% of data processing, URL normalization, Monet color math,
  * and semantic HTML generation on the server.
+ * Eliminates all inline scripts and styles for strict CSP Level 3 compliance.
  */
 
 const { db } = require('./db');
@@ -141,30 +142,27 @@ function generateCssVariables(seedHex, isDark) {
   }
 }
 
-function buildStyleBlock(accentColor, colorMode, bgType, bgValue) {
+function generateThemeCss(accentColor, colorMode, bgType, bgValue) {
   let customBgCss = '';
   if (bgType === 'image' && bgValue) {
-    customBgCss = `body { background-image: url('${escapeHtml(bgValue)}'); background-size: cover; background-position: center; }`;
+    customBgCss = `body { background-image: url('${bgValue.replace(/'/g, "\\'")}'); background-size: cover; background-position: center; }`;
   } else if (bgType === 'custom' && bgValue) {
-    customBgCss = `body { background: ${escapeHtml(bgValue)}; }`;
+    customBgCss = `body { background: ${bgValue}; }`;
   }
 
   if (colorMode === 'dark') {
-    return `<style>:root { ${generateCssVariables(accentColor, true)} } ${customBgCss}</style>`;
+    return `:root { ${generateCssVariables(accentColor, true)} } \n${customBgCss}`;
   }
   if (colorMode === 'light') {
-    return `<style>:root { ${generateCssVariables(accentColor, false)} } ${customBgCss}</style>`;
+    return `:root { ${generateCssVariables(accentColor, false)} } \n${customBgCss}`;
   }
 
-  // Auto Mode: Generate CSS media query rules so device theme transitions instantly with zero JS
   return `
-    <style>
-      :root { ${generateCssVariables(accentColor, true)} }
-      @media (prefers-color-scheme: light) {
-        :root { ${generateCssVariables(accentColor, false)} }
-      }
-      ${customBgCss}
-    </style>
+    :root { ${generateCssVariables(accentColor, true)} }
+    @media (prefers-color-scheme: light) {
+      :root { ${generateCssVariables(accentColor, false)} }
+    }
+    ${customBgCss}
   `;
 }
 
@@ -263,23 +261,15 @@ async function renderPublicBioPage() {
   const seoTitle = escapeHtml(profile.seo_title || `${displayName || handleFormatted} | Bio Page`);
   const seoDesc = escapeHtml(profile.seo_description || 'Personal links, contact details, and portfolio');
 
-  // 1. Precompute Dynamic Colors
-  const styleBlock = buildStyleBlock(
-    profile.accent_color || '#818cf8',
-    profile.color_mode || 'auto',
-    profile.background_type || 'preset',
-    profile.background_value || ''
-  );
-
-  // 2. Avatar Area
+  // Avatar Area (uses id for client-side error handling instead of inline onerror attribute)
   let avatarHtml = '';
   if (profile.avatar_url && profile.avatar_url.trim()) {
-    avatarHtml = `<img src="${escapeHtml(profile.avatar_url.trim())}" alt="${handleFormatted}" class="avatar-image" onerror="this.onerror=null; this.parentNode.innerHTML='<div class=\\'avatar-fallback\\'>${initial}</div>';">`;
+    avatarHtml = `<img src="${escapeHtml(profile.avatar_url.trim())}" alt="${handleFormatted}" class="avatar-image" id="profile-avatar-img">`;
   } else {
     avatarHtml = `<div class="avatar-fallback">${initial}</div>`;
   }
 
-  // 3. Direct Contact & Social Links Bar
+  // Direct Contact & Social Links Bar
   const renderedPlatforms = new Set();
   let contactPillsHtml = '';
 
@@ -319,7 +309,7 @@ async function renderPublicBioPage() {
     }
   });
 
-  // 4. Custom Link Cards
+  // Custom Link Cards
   let linkCardsHtml = '';
   links.forEach((link, idx) => {
     let iconClass = link.icon;
@@ -359,7 +349,7 @@ async function renderPublicBioPage() {
     `;
   });
 
-  // 5. Final Compiled HTML
+  // Final Compiled HTML (External stylesheet only, Zero inline styles, Zero inline scripts)
   const compiledHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -377,7 +367,7 @@ async function renderPublicBioPage() {
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="/css/style.css">
-  ${styleBlock}
+  <link rel="stylesheet" href="/api/theme.css">
 </head>
 <body>
   <div class="bg-blob-1"></div>
@@ -427,7 +417,6 @@ async function renderPublicBioPage() {
     <span id="toast-text-content">Link copied to clipboard!</span>
   </div>
 
-  <!-- Ultra-Lean Client Interaction & Analytics Controller (Only renders ripples and click interactions) -->
   <script src="/js/main.js"></script>
 </body>
 </html>`;
@@ -439,5 +428,6 @@ async function renderPublicBioPage() {
 }
 
 module.exports = {
+  generateThemeCss,
   renderPublicBioPage
 };

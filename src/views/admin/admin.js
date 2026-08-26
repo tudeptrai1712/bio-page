@@ -392,6 +392,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  const btnUploadAvatarTrigger = document.getElementById('btn-upload-avatar-trigger');
+  if (btnUploadAvatarTrigger && avatarFileInput) {
+    btnUploadAvatarTrigger.addEventListener('click', () => {
+      avatarFileInput.click();
+    });
+  }
+
   profileAvatarUrlInput.addEventListener('input', (e) => {
     updateAvatarPreview(e.target.value.trim());
   });

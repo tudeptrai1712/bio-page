@@ -79,7 +79,8 @@ async function delCache(key) {
 async function invalidateProfileCache() {
   await Promise.all([
     delCache('bio:public_profile'),
-    delCache('bio:ssr_html')
+    delCache('bio:ssr_html'),
+    delCache('bio:theme_css')
   ]);
 }
 
