@@ -1,0 +1,44 @@
+services:
+  bio-page:
+    image: ghcr.io/tudeptrai1712/bio-page:latest
+    container_name: bio-page
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - ADMIN_USERNAME=admin
+      - ADMIN_PASSWORD=admin123
+      - JWT_SECRET=super-secret-bio-jwt-key-please-change-in-production
+      - REDIS_URL=redis://redis:6379
+      - RP_NAME=Bio Page Passkey
+      - RP_ID=localhost
+      - ORIGIN=http://localhost:3000
+      - DATA_DIR=/app/data
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      - redis
+
+  redis:
+    image: redis:7-alpine
+    container_name: bio-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes
+    ports:
+      - "6379:6379"
+    volumes:
+      - ./data/redis:/data
+
+  # Automatic Update Agent (Pulls new images from GHCR on new GitHub releases/pushes)
+  watchtower:
+    image: containrrr/watchtower
+    container_name: bio-watchtower
+    restart: unless-stopped
+    environment:
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_POLL_INTERVAL=300 # Checks for new GitHub releases every 5 minutes
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
