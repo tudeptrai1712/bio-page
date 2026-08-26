@@ -803,12 +803,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (!optsRes.ok) throw new Error('Failed to get registration options');
       const options = await optsRes.json();
 
-      const formattedOpts = window.WebAuthnClient.preFormatRegistrationOptions(options);
-      const credential = await navigator.credentials.create({ publicKey: formattedOpts });
-
-      if (!credential) throw new Error('Registration was cancelled or failed.');
-
-      const formattedResponse = window.WebAuthnClient.formatRegistrationResponse(credential);
+      const formattedResponse = await window.WebAuthnClient.startRegistration(options);
 
       const verifyRes = await fetch('/api/auth/webauthn/register-verify', {
         method: 'POST',
