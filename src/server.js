@@ -277,11 +277,15 @@ app.post('/api/auth/webauthn/register-verify', requireAuth, async (req, res) => 
     const verification = await verifyRegistration(registrationResponse, expectedChallenge);
 
     if (verification.verified && verification.registrationInfo) {
-      const { credential } = verification.registrationInfo;
-      const credentialID = credential.id;
-      const credentialPublicKey = Buffer.from(credential.publicKey).toString('base64');
-      const counter = credential.counter;
-      const transports = credential.transports ? JSON.stringify(credential.transports) : '[]';
+      const regInfo = verification.registrationInfo;
+      const credential = regInfo.credential || {};
+      const credentialID = credential.id || regInfo.credentialID;
+      const rawPublicKey = credential.publicKey || regInfo.credentialPublicKey;
+      const credentialPublicKey = rawPublicKey ? Buffer.from(rawPublicKey).toString('base64') : '';
+      const counter = credential.counter ?? regInfo.counter ?? 0;
+      const transports = credential.transports 
+        ? JSON.stringify(credential.transports) 
+        : (regInfo.transports ? JSON.stringify(regInfo.transports) : (registrationResponse.response?.transports ? JSON.stringify(registrationResponse.response.transports) : '[]'));
 
       db.prepare(`
         INSERT INTO authenticators (user_id, credential_id, credential_public_key, counter, transports, device_name)
@@ -349,11 +353,15 @@ app.post('/api/auth/webauthn/auth-verify', async (req, res) => {
 
     if (verification.verified) {
       // Update counter and last_used_at
+      const newCounter = verification.authenticationInfo?.newCounter 
+        ?? verification.authenticationInfo?.counter 
+        ?? (Number(authenticator.counter) + 1);
+
       db.prepare(`
         UPDATE authenticators
         SET counter = ?, last_used_at = CURRENT_TIMESTAMP
         WHERE id = ?
-      `).run(verification.authenticationInfo.newCounter, authenticator.id);
+      `).run(newCounter, authenticator.id);
 
       await delChallenge(`auth:${challengeKey}`);
 

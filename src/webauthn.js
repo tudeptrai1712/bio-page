@@ -64,16 +64,29 @@ async function getAuthenticationOptions(authenticators = []) {
 
 // Verify authentication response from browser
 async function verifyAuth(response, expectedChallenge, authenticator) {
+  const pubKeyBuffer = Buffer.from(authenticator.credential_public_key, 'base64');
+  const transports = authenticator.transports ? JSON.parse(authenticator.transports) : undefined;
+  const credentialId = authenticator.credential_id;
+  const counter = Number(authenticator.counter) || 0;
+
   const verification = await verifyAuthenticationResponse({
     response,
     expectedChallenge,
     expectedOrigin: ORIGIN,
     expectedRPID: RP_ID,
+    // Modern SimpleWebAuthn (v10+)
+    credential: {
+      id: credentialId,
+      publicKey: new Uint8Array(pubKeyBuffer),
+      counter: counter,
+      transports: transports
+    },
+    // Legacy SimpleWebAuthn (v9 fallback)
     authenticator: {
-      credentialID: authenticator.credential_id,
-      credentialPublicKey: Buffer.from(authenticator.credential_public_key, 'base64'),
-      counter: authenticator.counter,
-      transports: authenticator.transports ? JSON.parse(authenticator.transports) : undefined
+      credentialID: credentialId,
+      credentialPublicKey: pubKeyBuffer,
+      counter: counter,
+      transports: transports
     },
     requireUserVerification: false
   });
