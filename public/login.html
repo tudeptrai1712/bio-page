@@ -15,233 +15,10 @@
   <!-- FontAwesome 6 Free Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <!-- Material 3 Expressive Styles -->
+  <!-- Material 3 Expressive Styles & External Login Stylesheet -->
   <link rel="stylesheet" href="/css/style.css">
-
-  <style>
-    body {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
-
-    .login-bento-card {
-      position: relative;
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: var(--m3-shape-corner-large);
-      width: 100%;
-      max-width: 420px;
-      padding: 36px 30px;
-      box-shadow: var(--card-shadow), var(--m3-elevation-2);
-      z-index: 10;
-      animation: m3Enter 0.55s var(--m3-motion-spring-expressive) forwards;
-    }
-
-    .login-header {
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .login-badge-icon {
-      width: 58px;
-      height: 58px;
-      background: linear-gradient(135deg, var(--m3-sys-color-primary), var(--m3-sys-color-secondary));
-      border-radius: var(--m3-shape-corner-medium);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.6rem;
-      color: #ffffff;
-      margin-bottom: 16px;
-      box-shadow: 0 8px 20px var(--m3-glow-primary);
-      transition: transform var(--m3-motion-duration-short) var(--m3-motion-spring-bouncy);
-    }
-
-    .login-badge-icon:hover {
-      transform: scale(1.1) rotate(6deg);
-    }
-
-    .login-title {
-      font-family: var(--m3-font-brand);
-      font-size: 1.45rem;
-      font-weight: 800;
-      letter-spacing: -0.4px;
-      color: var(--card-text);
-      margin-bottom: 6px;
-    }
-
-    .login-subtitle {
-      font-size: 0.88rem;
-      color: var(--m3-sys-color-on-surface-variant);
-    }
-
-    .btn-passkey {
-      width: 100%;
-      background: var(--m3-sys-color-primary-container);
-      border: 1px solid var(--m3-sys-color-outline);
-      color: var(--m3-sys-color-on-primary-container);
-      padding: 13px 18px;
-      border-radius: var(--m3-shape-corner-full);
-      font-size: 0.93rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      box-shadow: 0 4px 14px var(--m3-glow-primary);
-      transition: all var(--m3-motion-duration-short) var(--m3-motion-spring-bouncy);
-      margin-bottom: 20px;
-    }
-
-    .btn-passkey:hover {
-      background: var(--m3-sys-color-primary);
-      color: #ffffff;
-      transform: translateY(-2px);
-      box-shadow: 0 8px 22px var(--m3-glow-primary);
-    }
-
-    .btn-passkey:active {
-      transform: scale(0.96);
-    }
-
-    .divider {
-      display: flex;
-      align-items: center;
-      text-align: center;
-      color: var(--m3-sys-color-on-surface-variant);
-      font-size: 0.8rem;
-      margin-bottom: 20px;
-    }
-
-    .divider::before, .divider::after {
-      content: '';
-      flex: 1;
-      border-bottom: 1px solid var(--m3-sys-color-outline);
-    }
-
-    .divider:not(:empty)::before { margin-right: .6em; }
-    .divider:not(:empty)::after { margin-left: .6em; }
-
-    .form-group {
-      margin-bottom: 18px;
-    }
-
-    .form-label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--card-text);
-      margin-bottom: 8px;
-    }
-
-    .input-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .input-icon {
-      position: absolute;
-      left: 14px;
-      color: var(--m3-sys-color-on-surface-variant);
-      font-size: 0.95rem;
-    }
-
-    .form-input {
-      width: 100%;
-      background: var(--m3-sys-color-surface-container-high);
-      border: 1px solid var(--m3-sys-color-outline);
-      border-radius: var(--m3-shape-corner-medium);
-      padding: 12px 14px 12px 42px;
-      font-size: 0.94rem;
-      color: var(--card-text);
-      outline: none;
-      transition: all var(--m3-motion-duration-short) ease;
-    }
-
-    .form-input:focus {
-      border-color: var(--m3-sys-color-primary);
-      box-shadow: 0 0 0 3px var(--m3-glow-primary);
-    }
-
-    .btn-submit {
-      width: 100%;
-      background: var(--m3-sys-color-primary);
-      border: none;
-      color: #ffffff;
-      padding: 13px;
-      border-radius: var(--m3-shape-corner-full);
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all var(--m3-motion-duration-short) var(--m3-motion-spring-bouncy);
-      box-shadow: 0 4px 14px var(--m3-glow-primary);
-      margin-top: 22px;
-    }
-
-    .btn-submit:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 22px var(--m3-glow-primary);
-    }
-
-    .btn-submit:active {
-      transform: scale(0.96);
-    }
-
-    .error-box {
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.4);
-      color: #ef4444;
-      padding: 10px 14px;
-      border-radius: var(--m3-shape-corner-small);
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 18px;
-      display: none;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .error-box.show {
-      display: flex;
-    }
-
-    .default-hint {
-      margin-top: 18px;
-      text-align: center;
-      font-size: 0.8rem;
-      color: var(--m3-sys-color-on-surface-variant);
-      background: var(--m3-sys-color-outline-variant);
-      padding: 10px;
-      border-radius: var(--m3-shape-corner-small);
-      border: 1px dashed var(--m3-sys-color-outline);
-    }
-
-    .back-home {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 18px;
-      color: var(--m3-sys-color-on-surface-variant);
-      font-size: 0.85rem;
-      font-weight: 600;
-      text-decoration: none;
-      transition: color 0.2s, transform 0.2s;
-    }
-
-    .back-home:hover {
-      color: var(--m3-sys-color-primary);
-      transform: translateX(-3px);
-    }
-  </style>
+  <link rel="stylesheet" href="/css/login.css">
+  <link rel="stylesheet" href="/api/theme.css">
 </head>
 <body data-theme="classic-gray">
   <!-- Expressive Ambient Background Blobs -->
@@ -293,7 +70,7 @@
     </form>
 
     <!-- Fallback / Recovery TOTP Form -->
-    <form id="totp-form" style="display: none; margin-top: 12px;">
+    <form id="totp-form" class="totp-form">
       <div class="form-group">
         <label class="form-label" for="totp-username">Username</label>
         <div class="input-wrapper">
@@ -306,24 +83,24 @@
         <label class="form-label" for="totp-code">6-Digit Authenticator Code</label>
         <div class="input-wrapper">
           <i class="fas fa-shield-halved input-icon"></i>
-          <input type="text" id="totp-code" class="form-input" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="one-time-code" style="letter-spacing: 4px; font-size: 1.15rem; font-weight: 700; text-align: center;">
+          <input type="text" id="totp-code" class="form-input totp-input-code" placeholder="000000" maxlength="6" inputmode="numeric" autocomplete="one-time-code">
         </div>
       </div>
 
-      <button type="submit" class="btn-submit m3-ripple-surface" id="btn-totp-submit" style="margin-top: 10px;">
+      <button type="submit" class="btn-submit btn-totp-submit m3-ripple-surface" id="btn-totp-submit">
         <span>Verify Code & Sign In</span>
         <i class="fas fa-arrow-right"></i>
       </button>
     </form>
 
     <!-- Recovery / Fallback Links -->
-    <div style="text-align: center; margin-top: 16px;">
-      <button type="button" id="btn-toggle-totp" style="background: none; border: none; color: var(--text-muted); font-size: 0.82rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 4px 8px; border-radius: 4px; transition: color 0.2s;">
+    <div class="login-toggle-area">
+      <button type="button" id="btn-toggle-totp" class="btn-toggle-totp">
         <i class="fas fa-shield-halved"></i> <span id="toggle-totp-text">Sign in with Authenticator App (TOTP)</span>
       </button>
     </div>
 
-    <div style="text-align: center; margin-top: 14px;">
+    <div class="login-footer-nav">
       <a href="/" class="back-home">
         <i class="fas fa-arrow-left"></i> Back to Bio Page
       </a>
