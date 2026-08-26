@@ -5,20 +5,32 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+.pnpm-store/
+.npm/
 
-# Runtime data & Database (SQLite / WAL / SHM)
+# Runtime data & Database (SQLite / WAL / SHM / Redis multi-part AOF & RDB)
 data/*.sqlite*
+data/*.db*
 data/database.sqlite*
-data/uploads/*
+data/uploads/**
 !data/uploads/.gitkeep
-data/redis/*
+data/redis/**
 !data/redis/.gitkeep
+data/backups/
+data/backup/
+*.rdb
+*.aof
 
 # Environment variables & secrets
 .env
 .env.local
 .env.*.local
 *.env
+!.env.example
+cookies.txt
+*.pem
+*.key
+*.cert
 
 # Logs & temporary files
 *.log
@@ -26,6 +38,8 @@ logs/
 temp/
 tmp/
 .cache/
+coverage/
+.nyc_output/
 
 # OS-generated files
 .DS_Store
