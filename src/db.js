@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 const bcrypt = require('bcryptjs');
 
-const dataDir = path.join(__dirname, '..', 'data');
+const dataDir = process.env.DATA_DIR || path.join(__dirname, '..', 'data');
 const uploadsDir = path.join(dataDir, 'uploads');
 const redisDir = path.join(dataDir, 'redis');
 
@@ -17,7 +17,7 @@ if (!fs.existsSync(redisDir)) {
   fs.mkdirSync(redisDir, { recursive: true });
 }
 
-const dbPath = path.join(dataDir, 'database.sqlite');
+const dbPath = process.env.DB_PATH || path.join(dataDir, 'database.sqlite');
 const db = new Database(dbPath);
 
 // Enable WAL mode for better concurrency and performance

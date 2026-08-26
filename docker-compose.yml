@@ -15,6 +15,7 @@ services:
       - RP_NAME=Bio Page Passkey
       - RP_ID=localhost
       - ORIGIN=http://localhost:3000
+      - DATA_DIR=/app/data
     volumes:
       - ./data:/app/data
     depends_on:
