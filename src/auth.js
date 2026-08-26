@@ -107,6 +107,26 @@ async function requireAuth(req, res, next) {
   next();
 }
 
+async function requireAuthOrRedirect(req, res, next) {
+  const token = req.cookies[COOKIE_NAME] || (req.headers.authorization && req.headers.authorization.split(' ')[1]);
+
+  if (!token) {
+    return res.redirect('/login.html');
+  }
+
+  const decoded = verifyToken(token);
+  if (!decoded) {
+    return res.redirect('/login.html');
+  }
+
+  if (decoded.jti && (await isTokenBlacklisted(decoded.jti))) {
+    return res.redirect('/login.html');
+  }
+
+  req.user = decoded;
+  next();
+}
+
 module.exports = {
   COOKIE_NAME,
   generateToken,
@@ -117,5 +137,6 @@ module.exports = {
   comparePassword,
   setAuthCookie,
   validatePasswordStrength,
-  requireAuth
+  requireAuth,
+  requireAuthOrRedirect
 };

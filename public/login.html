@@ -332,7 +332,6 @@
 
   <script src="https://unpkg.com/@simplewebauthn/browser@13.1.0/dist/bundle/index.umd.min.js"></script>
   <script src="/js/m3-theme.js"></script>
-  <script src="/js/webauthn-client.js"></script>
   <script>
     let isPasswordAllowed = true;
     let isTotpActive = false;
@@ -361,7 +360,7 @@
     // Auto redirect if already logged in
     fetch('/api/auth/me')
       .then(res => {
-        if (res.ok) window.location.href = '/admin.html';
+        if (res.ok) window.location.href = '/admin';
       })
       .catch(() => {});
 
@@ -421,7 +420,7 @@
 
         const data = await res.json();
         if (res.ok) {
-          window.location.href = '/admin.html';
+          window.location.href = '/admin';
         } else {
           errorText.textContent = data.error || 'Invalid TOTP code';
           errorBox.classList.add('show');
@@ -455,7 +454,7 @@
 
         const data = await res.json();
         if (res.ok) {
-          window.location.href = '/admin.html';
+          window.location.href = '/admin';
         } else {
           errorText.textContent = data.error || 'Invalid credentials';
           errorBox.classList.add('show');
@@ -472,7 +471,7 @@
 
     // Passkey biometric login
     btnPasskey.addEventListener('click', async () => {
-      if (!window.WebAuthnClient.isSupported()) {
+      if (!window.PublicKeyCredential || !navigator.credentials) {
         errorText.textContent = 'WebAuthn is not supported on this browser or device.';
         errorBox.classList.add('show');
         return;
@@ -489,7 +488,12 @@
         if (!optsRes.ok) throw new Error('Failed to get authentication challenge');
         const options = await optsRes.json();
 
-        const authResponse = await window.WebAuthnClient.startAuthentication(options);
+        let authResponse;
+        if (window.SimpleWebAuthnBrowser && typeof window.SimpleWebAuthnBrowser.startAuthentication === 'function') {
+          authResponse = await window.SimpleWebAuthnBrowser.startAuthentication(options);
+        } else {
+          throw new Error('Authentication library could not be loaded.');
+        }
 
         const verifyRes = await fetch('/api/auth/webauthn/auth-verify', {
           method: 'POST',
@@ -502,7 +506,7 @@
 
         const verifyData = await verifyRes.json();
         if (verifyRes.ok) {
-          window.location.href = '/admin.html';
+          window.location.href = '/admin';
         } else {
           errorText.textContent = verifyData.error || 'Passkey verification failed';
           errorBox.classList.add('show');
