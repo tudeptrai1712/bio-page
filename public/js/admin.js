@@ -189,6 +189,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
+  const modalIconPreview = document.getElementById('modal-icon-preview');
+
+  function updateModalIconPreview(val) {
+    if (!modalIconPreview) return;
+    const str = (val || '').trim();
+    if (!str) {
+      modalIconPreview.innerHTML = '<i class="fas fa-globe"></i>';
+    } else if (str.startsWith('fa') || str.includes(' fa-')) {
+      modalIconPreview.innerHTML = `<i class="${str}"></i>`;
+    } else {
+      modalIconPreview.innerHTML = `<span>${str}</span>`;
+    }
+  }
+
+  if (modalLinkIconInput) {
+    modalLinkIconInput.addEventListener('input', (e) => {
+      updateModalIconPreview(e.target.value);
+    });
+  }
+
+  // Quick icon presets
+  document.querySelectorAll('.btn-icon-preset').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const icon = btn.getAttribute('data-icon');
+      const title = btn.getAttribute('data-title');
+      if (modalLinkIconInput) {
+        modalLinkIconInput.value = icon;
+        updateModalIconPreview(icon);
+      }
+      if (modalLinkTitleInput && !modalLinkTitleInput.value.trim()) {
+        modalLinkTitleInput.value = title;
+      }
+    });
+  });
+
   // Modal open / close
   document.getElementById('btn-open-add-link').addEventListener('click', () => {
     modalLinkId.value = '';
@@ -196,7 +231,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     modalLinkTitleInput.value = '';
     modalLinkUrlInput.value = '';
     modalLinkDescInput.value = '';
-    modalLinkIconInput.value = '🔗';
+    modalLinkIconInput.value = 'fas fa-globe';
+    updateModalIconPreview('fas fa-globe');
     modalLinkHighlightInput.checked = false;
     modalLink.classList.add('show');
   });
@@ -207,7 +243,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     modalLinkTitleInput.value = link.title;
     modalLinkUrlInput.value = link.url;
     modalLinkDescInput.value = link.description || '';
-    modalLinkIconInput.value = link.icon || '🔗';
+    modalLinkIconInput.value = link.icon || 'fas fa-globe';
+    updateModalIconPreview(link.icon || 'fas fa-globe');
     modalLinkHighlightInput.checked = !!link.is_highlighted;
     modalLink.classList.add('show');
   }
@@ -284,6 +321,11 @@ document.addEventListener('DOMContentLoaded', async () => {
   const profileHandleInput = document.getElementById('profile-handle-input');
   const profileTaglineInput = document.getElementById('profile-tagline-input');
   const profileBioInput = document.getElementById('profile-bio-input');
+  const contactEmailInput = document.getElementById('contact-email-input');
+  const contactPhoneInput = document.getElementById('contact-phone-input');
+  const contactWhatsappInput = document.getElementById('contact-whatsapp-input');
+  const contactTelegramInput = document.getElementById('contact-telegram-input');
+  const contactSignalInput = document.getElementById('contact-signal-input');
   const profileAvatarUrlInput = document.getElementById('profile-avatar-url-input');
   const profileFooterInput = document.getElementById('profile-footer-input');
   const seoTitleInput = document.getElementById('seo-title-input');
@@ -301,8 +343,15 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       profileNameInput.value = currentProfile.name || '';
       profileHandleInput.value = currentProfile.handle || '';
-      profileTaglineInput.value = currentProfile.tagline || '';
+      if (profileTaglineInput) profileTaglineInput.value = currentProfile.tagline || '';
       profileBioInput.value = currentProfile.bio || '';
+      
+      if (contactEmailInput) contactEmailInput.value = currentProfile.contact_email || '';
+      if (contactPhoneInput) contactPhoneInput.value = currentProfile.contact_phone || '';
+      if (contactWhatsappInput) contactWhatsappInput.value = currentProfile.contact_whatsapp || '';
+      if (contactTelegramInput) contactTelegramInput.value = currentProfile.contact_telegram || '';
+      if (contactSignalInput) contactSignalInput.value = currentProfile.contact_signal || '';
+
       profileAvatarUrlInput.value = currentProfile.avatar_url || '';
       profileFooterInput.value = currentProfile.footer_text || '';
       seoTitleInput.value = currentProfile.seo_title || '';
@@ -310,9 +359,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       updateAvatarPreview(currentProfile.avatar_url);
 
-      selectThemeCard(currentProfile.theme || 'midnight');
-      document.getElementById('accent-color-picker').value = currentProfile.accent_color || '#6366f1';
-      document.getElementById('accent-color-input').value = currentProfile.accent_color || '#6366f1';
+      selectThemeCard(currentProfile.theme || 'classic-gray');
+      document.getElementById('accent-color-picker').value = currentProfile.accent_color || '#818cf8';
+      document.getElementById('accent-color-input').value = currentProfile.accent_color || '#818cf8';
       document.getElementById('bg-type-select').value = currentProfile.background_type || 'preset';
       document.getElementById('bg-value-input').value = currentProfile.background_value || '';
       toggleBgValueField(currentProfile.background_type);
@@ -370,8 +419,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       ...currentProfile,
       name: profileNameInput.value.trim(),
       handle: profileHandleInput.value.trim(),
-      tagline: profileTaglineInput.value.trim(),
+      tagline: profileTaglineInput ? profileTaglineInput.value.trim() : '',
       bio: profileBioInput.value.trim(),
+      contact_email: contactEmailInput ? contactEmailInput.value.trim() : '',
+      contact_phone: contactPhoneInput ? contactPhoneInput.value.trim() : '',
+      contact_whatsapp: contactWhatsappInput ? contactWhatsappInput.value.trim() : '',
+      contact_telegram: contactTelegramInput ? contactTelegramInput.value.trim() : '',
+      contact_signal: contactSignalInput ? contactSignalInput.value.trim() : '',
       avatar_url: profileAvatarUrlInput.value.trim(),
       footer_text: profileFooterInput.value.trim(),
       seo_title: seoTitleInput.value.trim(),
@@ -386,7 +440,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       });
       if (res.ok) {
         currentProfile = payload;
-        showToast('Profile saved successfully! ✨');
+        showToast('Profile & Contact details saved! ✨');
       } else {
         showToast('Failed to save profile', true);
       }

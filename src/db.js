@@ -50,17 +50,22 @@ function initDatabase() {
       id INTEGER PRIMARY KEY CHECK (id = 1),
       name TEXT DEFAULT 'Your Name',
       handle TEXT DEFAULT '@yourhandle',
-      tagline TEXT DEFAULT 'Digital Creator & Developer',
-      bio TEXT DEFAULT 'Welcome to my official bio page! Check out my work, social profiles, and recent projects below.',
+      tagline TEXT DEFAULT 'Digital Creator & Developer 🚀',
+      bio TEXT DEFAULT 'Welcome to my official bio page! Check out my work, social profiles, and recent links below.',
       avatar_url TEXT DEFAULT '',
       banner_url TEXT DEFAULT '',
-      theme TEXT DEFAULT 'midnight',
-      accent_color TEXT DEFAULT '#6366f1',
+      theme TEXT DEFAULT 'classic-gray',
+      accent_color TEXT DEFAULT '#818cf8',
       background_type TEXT DEFAULT 'preset',
-      background_value TEXT DEFAULT 'midnight',
+      background_value TEXT DEFAULT 'classic-gray',
       seo_title TEXT DEFAULT 'My Bio Page',
-      seo_description TEXT DEFAULT 'Personal bio, links, and portfolio',
+      seo_description TEXT DEFAULT 'Personal bio and links',
       footer_text TEXT DEFAULT 'Built with Self-Hosted Bio Page',
+      contact_email TEXT DEFAULT '',
+      contact_phone TEXT DEFAULT '',
+      contact_whatsapp TEXT DEFAULT '',
+      contact_telegram TEXT DEFAULT '',
+      contact_signal TEXT DEFAULT '',
       show_share_button INTEGER DEFAULT 1,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
@@ -79,7 +84,7 @@ function initDatabase() {
       title TEXT NOT NULL,
       url TEXT NOT NULL,
       description TEXT DEFAULT '',
-      icon TEXT DEFAULT '🔗',
+      icon TEXT DEFAULT 'fas fa-globe',
       is_highlighted INTEGER DEFAULT 0,
       display_order INTEGER DEFAULT 0,
       enabled INTEGER DEFAULT 1,
@@ -97,6 +102,13 @@ function initDatabase() {
     );
   `);
 
+  // Migrations for contact columns if missing
+  try { db.exec("ALTER TABLE profile ADD COLUMN contact_email TEXT DEFAULT ''"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN contact_phone TEXT DEFAULT ''"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN contact_whatsapp TEXT DEFAULT ''"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN contact_telegram TEXT DEFAULT ''"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN contact_signal TEXT DEFAULT ''"); } catch(e){}
+
   // Seed default admin if not exists
   const userCount = db.prepare('SELECT COUNT(*) AS count FROM users').get().count;
   if (userCount === 0) {
@@ -112,12 +124,12 @@ function initDatabase() {
   const profileCount = db.prepare('SELECT COUNT(*) AS count FROM profile').get().count;
   if (profileCount === 0) {
     db.prepare(`
-      INSERT INTO profile (id, name, handle, tagline, bio, theme, accent_color)
-      VALUES (1, 'Alex Morgan', '@alexmorgan', 'Full-Stack Developer & Creator 🚀', 'Building open-source tools and sharing knowledge about modern web tech. Feel free to explore my links below!', 'midnight', '#6366f1')
+      INSERT INTO profile (id, name, handle, tagline, bio, theme, accent_color, contact_email)
+      VALUES (1, 'Your Name', '@yourhandle', 'Digital Creator & Developer 🚀', 'Welcome to my official bio page! Check out my work, social profiles, and recent links below.', 'classic-gray', '#818cf8', 'hello@example.com')
     `).run();
   }
 
-  // Seed sample links if empty
+  // Seed generic sample links if empty
   const linksCount = db.prepare('SELECT COUNT(*) AS count FROM links').get().count;
   if (linksCount === 0) {
     const insertLink = db.prepare(`
@@ -125,25 +137,10 @@ function initDatabase() {
       VALUES (?, ?, ?, ?, ?, ?, 1)
     `);
 
-    insertLink.run('Personal Portfolio', 'https://github.com', 'Check out my latest web projects and case studies', '💻', 1, 1);
-    insertLink.run('Latest Blog Post', 'https://medium.com', 'How I built a high-performance bio page with Docker', '📝', 0, 2);
-    insertLink.run('YouTube Channel', 'https://youtube.com', 'Tutorials, tech guides, and productivity workflows', '🎥', 0, 3);
-    insertLink.run('Buy Me a Coffee', 'https://buymeacoffee.com', 'Support my open-source projects', '☕', 0, 4);
-  }
-
-  // Seed sample social links if empty
-  const socialsCount = db.prepare('SELECT COUNT(*) AS count FROM social_links').get().count;
-  if (socialsCount === 0) {
-    const insertSocial = db.prepare(`
-      INSERT INTO social_links (platform, url, icon, display_order, enabled)
-      VALUES (?, ?, ?, ?, 1)
-    `);
-
-    insertSocial.run('github', 'https://github.com', 'fab fa-github', 1);
-    insertSocial.run('x', 'https://x.com', 'fab fa-x-twitter', 2);
-    insertSocial.run('linkedin', 'https://linkedin.com', 'fab fa-linkedin', 3);
-    insertSocial.run('youtube', 'https://youtube.com', 'fab fa-youtube', 4);
-    insertSocial.run('email', 'mailto:alex@example.com', 'fas fa-envelope', 5);
+    insertLink.run('Facebook', 'https://facebook.com', '', 'fab fa-facebook-f', 0, 1);
+    insertLink.run('Instagram', 'https://instagram.com', '', 'fab fa-instagram', 0, 2);
+    insertLink.run('Locket', 'https://locket.camera', '', 'fas fa-heart', 0, 3);
+    insertLink.run('YouTube', 'https://youtube.com', '', 'fab fa-youtube', 0, 4);
   }
 }
 
