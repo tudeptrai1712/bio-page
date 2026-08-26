@@ -33,7 +33,6 @@ router.post('/login', (req, res) => {
 
   res.json({
     success: true,
-    token,
     user: { id: user.id, username: user.username }
   });
 });

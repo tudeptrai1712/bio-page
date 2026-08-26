@@ -143,7 +143,6 @@ router.post('/auth-verify', async (req, res) => {
 
       res.json({
         success: true,
-        token,
         user: { id: user.id, username: user.username }
       });
     } else {

@@ -18,7 +18,15 @@ router.get('/profile', async (req, res) => {
       return res.json(cached);
     }
 
-    const profile = db.prepare('SELECT * FROM profile WHERE id = 1').get();
+    const profile = db.prepare(`
+      SELECT 
+        name, handle, tagline, bio, avatar_url, banner_url,
+        theme, accent_color, background_type, background_value,
+        seo_title, seo_description, footer_text,
+        contact_email, contact_phone, contact_whatsapp, contact_telegram, contact_signal,
+        color_mode, show_share_button
+      FROM profile WHERE id = 1
+    `).get();
     const links = db.prepare('SELECT id, title, url, description, icon, is_highlighted, display_order FROM links WHERE enabled = 1 ORDER BY display_order ASC, id ASC').all();
     const socials = db.prepare('SELECT id, platform, url, icon, display_order FROM social_links WHERE enabled = 1 ORDER BY display_order ASC, id ASC').all();
 
