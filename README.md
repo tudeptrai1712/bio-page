@@ -9,6 +9,9 @@ A high-performance, modern, self-hosted link-in-bio page (alternative to Linktre
 
 Images are **automatically built for `amd64` and `arm64` via GitHub Actions** and published to the **GitHub Container Registry (GHCR)**.
 
+> [!NOTE]
+> ⚠️ **Vibecoding / Personal Project Notice**: This project is vibecoded primarily for personal purposes and experimentation. While fully functional and feature-packed, it's crafted with a fast-and-flexible vibe. Contributions and fixes are warmly welcomed!
+
 ---
 
 ## ✨ Features
@@ -38,23 +41,20 @@ Images are **automatically built for `amd64` and `arm64` via GitHub Actions** an
 
 ## 🚀 Quick Start
 
+> [!TIP]
+> **You do NOT need to build the Docker image!** Pre-built multi-arch images are pulled automatically from GHCR. You just need to run `docker compose up -d`.
+
 ### Option 1: Using Pre-built Image from GHCR (Recommended & Fastest)
 
-> [!TIP]
-> **No build step required!** You do **not** need to build the Docker image locally. Pre-built multi-arch images (`amd64`/`arm64`) are automatically pulled from GitHub Container Registry (`ghcr.io`). Simply start the container with `docker compose up -d`.
+No local building or Node.js setup required! Deploy instantly using the pre-built compose stack:
 
-1. **Clone the repository**:
+1. **Clone the repository or download `docker-compose.prod.yml`**:
    ```bash
    git clone https://github.com/tudeptrai1712/bio-page.git
    cd bio-page
    ```
 
-2. **Start the containers** (Pulls pre-built image & Redis instantly):
-   ```bash
-   docker compose up -d
-   ```
-
-   *Or run with automated updates via Watchtower:*
+2. **Start the containers** (Just `docker compose up -d`, pulls `ghcr.io/tudeptrai1712/bio-page:latest`, Redis & Watchtower):
    ```bash
    docker compose -f docker-compose.prod.yml up -d
    ```
@@ -63,9 +63,9 @@ Images are **automatically built for `amd64` and `arm64` via GitHub Actions** an
 
 ---
 
-### Option 2: Build Locally from Source (Optional)
+### Option 2: Build Locally from Source
 
-If you made modifications to the source code and want to compile/build your own image locally:
+If you want to modify the source code and build locally:
 
 1. **Clone the repository**:
    ```bash
@@ -164,5 +164,12 @@ You can configure options in `docker-compose.yml`, `docker-compose.prod.yml`, or
 
 ---
 
+## 🤝 Contributing & Pull Requests
+
+Feel free to open a **Pull Request** or issue! Whether it's adding new features, improving themes, optimizing caching, or fixing bugs, contributions are always welcome.
+
+---
+
 ## 📄 License
 MIT License. Free to use, self-host, and customize!
+
