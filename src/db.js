@@ -62,7 +62,7 @@ function initDatabase() {
       background_value TEXT DEFAULT 'classic-gray',
       seo_title TEXT DEFAULT 'My Bio Page',
       seo_description TEXT DEFAULT 'Personal bio and links',
-      footer_text TEXT DEFAULT 'Built with Self-Hosted Bio Page',
+      footer_text TEXT DEFAULT '',
       contact_email TEXT DEFAULT '',
       contact_phone TEXT DEFAULT '',
       contact_whatsapp TEXT DEFAULT '',
@@ -117,6 +117,7 @@ function initDatabase() {
   try { db.exec("ALTER TABLE profile ADD COLUMN allow_password_login INTEGER DEFAULT 1"); } catch(e){}
   try { db.exec("ALTER TABLE users ADD COLUMN totp_secret TEXT DEFAULT ''"); } catch(e){}
   try { db.exec("ALTER TABLE users ADD COLUMN totp_enabled INTEGER DEFAULT 0"); } catch(e){}
+  try { db.exec("UPDATE profile SET footer_text = '' WHERE footer_text = 'Built with Self-Hosted Bio Page'"); } catch(e){}
 
   // Seed default admin if not exists
   const userCount = db.prepare('SELECT COUNT(*) AS count FROM users').get().count;
