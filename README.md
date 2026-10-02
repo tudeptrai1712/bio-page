@@ -4,7 +4,7 @@
 [![Docker Image](https://img.shields.io/badge/GHCR-ghcr.io%2Ftudeptrai1712%2Fbio--page-blue?logo=docker)](https://github.com/tudeptrai1712/bio-page/pkgs/container/bio-page)
 [![Platform](https://img.shields.io/badge/platform-linux%2Famd64%20%7C%20linux%2Farm64-informational)](https://github.com/tudeptrai1712/bio-page/pkgs/container/bio-page)
 [![Security: OWASP ASVS L2](https://img.shields.io/badge/Security-OWASP%20ASVS%20v4.0%20L2-success)](https://owasp.org/www-project-application-security-verification-standard/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 
 A high-performance, modern, self-hosted link-in-bio page (alternative to Linktree / Bento) with an interactive **Admin Panel**, **Redis sub-millisecond caching & real-time analytics**, **Passwordless WebAuthn / Passkeys** (Touch ID, Windows Hello, Face ID, YubiKey), **TOTP 2FA / Fallback Recovery**, and **OWASP ASVS Level 2 Hardening** ready for **Cloudflare Tunnel** deployment.
 
@@ -194,4 +194,24 @@ Feel free to open a **Pull Request** or issue! Whether it's adding new features,
 ---
 
 ## 📄 License
-MIT License. Free to use, self-host, and customize!
+
+This project is free and open-source software licensed under the **[GNU Affero General Public License v3.0 (AGPLv3)](LICENSE)**.
+
+### Allowed Uses & Commercial Freedom
+- **Self-Hosting**: You are completely free to self-host and run Bio Page for personal, non-profit, or commercial use.
+- **Monetization**: You may monetize your own Bio Page instance through advertisements, affiliate links, sponsorships, donations, or selling products/services.
+- **Commercial Services**: You may offer commercial services (e.g., managed hosting, custom design, installation, support, or consulting), provided you comply with the AGPLv3. AGPLv3 does **not** prohibit commercial hosting or SaaS.
+- **Modification & Forking**: You are free to modify, customize, and redistribute the code under the terms of the AGPLv3.
+
+### Copyleft & Network Use (Section 13)
+- Under Section 13 of the AGPLv3, if you run a **modified version** of Bio Page on a server and allow remote users to interact with it over a computer network, you must make the Corresponding Source of your modified version available to those users at no charge under the AGPLv3.
+- All derivative works and modifications must remain licensed under AGPLv3 when distributed or conveyed.
+
+### Attribution & Origin Protection
+- You must preserve all original copyright notices, license texts, and author attributions.
+- In accordance with Section 7 of the AGPLv3 and our **[Trademark & Branding Policy](TRADEMARKS.md)**, modified versions, forks, and hosted deployments must **not** misrepresent their origin, falsely claim to be the official original Bio Page project, or imply endorsement by the original author (**Hồng Nhật Tú**).
+- **Suggested attribution wording**:
+  - For unmodified deployments:
+    > *This software is based on Bio Page by Hồng Nhật Tú.*
+  - For modified versions or forks:
+    > *This software is a modified version of Bio Page by Hồng Nhật Tú.*

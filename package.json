@@ -8,8 +8,8 @@
     "dev": "node src/server.js"
   },
   "keywords": ["bio", "linktree", "self-hosted", "admin", "docker", "redis", "webauthn", "passkey"],
-  "author": "",
-  "license": "MIT",
+  "author": "Hồng Nhật Tú",
+  "license": "AGPL-3.0-or-later",
   "dependencies": {
     "@simplewebauthn/server": "^13.1.1",
     "better-sqlite3": "^11.8.1",
