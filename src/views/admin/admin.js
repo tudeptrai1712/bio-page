@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (contactZaloInput) contactZaloInput.value = currentProfile.contact_zalo || '';
 
       profileAvatarUrlInput.value = currentProfile.avatar_url || '';
-      profileFooterInput.value = (currentProfile.footer_text && currentProfile.footer_text !== 'Built with Self-Hosted Bio Page') ? currentProfile.footer_text : '';
+      profileFooterInput.value = currentProfile.footer_text || '';
       seoTitleInput.value = currentProfile.seo_title || '';
       seoDescInput.value = currentProfile.seo_description || '';
 
