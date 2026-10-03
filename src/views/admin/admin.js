@@ -59,9 +59,60 @@ document.addEventListener('DOMContentLoaded', async () => {
       };
       tabHeading.textContent = titleMap[tabId] || 'Dashboard';
 
+      if (window.innerWidth <= 900) {
+        closeSidebar();
+      }
+
       if (tabId === 'analytics') loadAnalytics();
       if (tabId === 'settings') loadPasskeys();
     });
+  });
+
+  // Mobile Sidebar Drawer Toggle & Overlay
+  const sidebar = document.getElementById('sidebar');
+  const sidebarOverlay = document.getElementById('sidebar-overlay');
+  const btnSidebarToggle = document.getElementById('btn-sidebar-toggle');
+  const btnSidebarClose = document.getElementById('btn-sidebar-close');
+
+  function openSidebar() {
+    if (sidebar) sidebar.classList.add('open');
+    if (sidebarOverlay) sidebarOverlay.classList.add('open');
+    document.body.classList.add('sidebar-locked');
+  }
+
+  function closeSidebar() {
+    if (sidebar) sidebar.classList.remove('open');
+    if (sidebarOverlay) sidebarOverlay.classList.remove('open');
+    document.body.classList.remove('sidebar-locked');
+  }
+
+  if (btnSidebarToggle) {
+    btnSidebarToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (sidebar && sidebar.classList.contains('open')) {
+        closeSidebar();
+      } else {
+        openSidebar();
+      }
+    });
+  }
+
+  if (btnSidebarClose) {
+    btnSidebarClose.addEventListener('click', (e) => {
+      e.stopPropagation();
+      closeSidebar();
+    });
+  }
+
+  if (sidebarOverlay) {
+    sidebarOverlay.addEventListener('click', closeSidebar);
+  }
+
+  // Close sidebar on Escape key
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sidebar && sidebar.classList.contains('open')) {
+      closeSidebar();
+    }
   });
 
   // Logout
