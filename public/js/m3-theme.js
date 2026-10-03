@@ -207,6 +207,9 @@
       const diameter = Math.max(target.clientWidth, target.clientHeight) * 1.5;
       const radius = diameter / 2;
 
+      circle.style.position = 'absolute';
+      circle.style.pointerEvents = 'none';
+      circle.style.borderRadius = '50%';
       circle.style.width = circle.style.height = `${diameter}px`;
       circle.style.left = `${e.clientX - rect.left - radius}px`;
       circle.style.top = `${e.clientY - rect.top - radius}px`;
