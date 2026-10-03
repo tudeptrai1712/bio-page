@@ -403,30 +403,317 @@ document.addEventListener('DOMContentLoaded', async () => {
     updateAvatarPreview(e.target.value.trim());
   });
 
-  avatarFileInput.addEventListener('change', async () => {
+  // --- Avatar Crop & Adjust Controller ---
+  const modalCropAvatar = document.getElementById('modal-crop-avatar');
+  const cropperImage = document.getElementById('cropper-image');
+  const cropperStage = document.querySelector('.cropper-stage');
+  const btnCloseCropModal = document.getElementById('btn-close-crop-modal');
+  const btnCancelCropModal = document.getElementById('btn-cancel-crop-modal');
+  const btnApplyCrop = document.getElementById('btn-apply-crop');
+  const btnCropZoomIn = document.getElementById('btn-crop-zoom-in');
+  const btnCropZoomOut = document.getElementById('btn-crop-zoom-out');
+  const cropZoomSlider = document.getElementById('crop-zoom-slider');
+  const btnCropRotateLeft = document.getElementById('btn-crop-rotate-left');
+  const btnCropRotateRight = document.getElementById('btn-crop-rotate-right');
+  const cropRotateSlider = document.getElementById('crop-rotate-slider');
+  const cropRotateVal = document.getElementById('crop-rotate-val');
+  const btnCropFlipX = document.getElementById('btn-crop-flip-x');
+  const btnCropFlipY = document.getElementById('btn-crop-flip-y');
+  const btnCropReset = document.getElementById('btn-crop-reset');
+  const btnAspect11 = document.getElementById('btn-aspect-1-1');
+  const btnAspectFree = document.getElementById('btn-aspect-free');
+  const btnCropAvatarTrigger = document.getElementById('btn-crop-avatar-trigger');
+  const btnRemoveAvatar = document.getElementById('btn-remove-avatar');
+
+  let cropperInstance = null;
+  let activeCropObjectUrl = null;
+  let currentFileMime = 'image/jpeg';
+  let baseRotationAngle = 0;
+  let currentScaleX = 1;
+  let currentScaleY = 1;
+
+  function resetCropControls() {
+    baseRotationAngle = 0;
+    currentScaleX = 1;
+    currentScaleY = 1;
+    if (cropRotateSlider) cropRotateSlider.value = 0;
+    if (cropRotateVal) cropRotateVal.textContent = '0°';
+    if (cropZoomSlider) cropZoomSlider.value = 1;
+    if (btnAspect11) btnAspect11.classList.add('active');
+    if (btnAspectFree) btnAspectFree.classList.remove('active');
+    if (cropperStage) cropperStage.classList.add('cropper-circular-mode');
+  }
+
+  function openCropModal(imageSrc, mimeType = 'image/jpeg') {
+    currentFileMime = mimeType.toLowerCase().includes('png') ? 'image/png' : 'image/jpeg';
+    resetCropControls();
+
+    if (modalCropAvatar) {
+      modalCropAvatar.classList.add('show');
+    }
+
+    if (cropperInstance) {
+      cropperInstance.destroy();
+      cropperInstance = null;
+    }
+
+    cropperImage.src = imageSrc;
+
+    // Small delay to ensure modal is rendered and dimensions are computed
+    setTimeout(() => {
+      if (typeof Cropper === 'undefined') {
+        showToast('Cropper library not loaded', true);
+        return;
+      }
+
+      cropperInstance = new Cropper(cropperImage, {
+        aspectRatio: 1,
+        viewMode: 1,
+        dragMode: 'move',
+        autoCropArea: 0.9,
+        restore: false,
+        guides: true,
+        center: true,
+        highlight: false,
+        cropBoxMovable: true,
+        cropBoxResizable: true,
+        toggleDragModeOnDblclick: false,
+        preview: '#crop-circular-preview',
+        ready() {
+          resetCropControls();
+        },
+        crop(e) {
+          if (!cropperInstance) return;
+          const canvasData = cropperInstance.getCanvasData();
+          const initialData = cropperInstance.getInitialCanvasData();
+          if (initialData && initialData.width && cropZoomSlider) {
+            const ratio = canvasData.width / initialData.width;
+            if (Math.abs(parseFloat(cropZoomSlider.value) - ratio) > 0.08) {
+              cropZoomSlider.value = Math.max(0.2, Math.min(3, ratio)).toFixed(2);
+            }
+          }
+        }
+      });
+    }, 50);
+  }
+
+  function closeCropModal() {
+    if (modalCropAvatar) {
+      modalCropAvatar.classList.remove('show');
+    }
+    if (cropperInstance) {
+      cropperInstance.destroy();
+      cropperInstance = null;
+    }
+    if (activeCropObjectUrl) {
+      URL.revokeObjectURL(activeCropObjectUrl);
+      activeCropObjectUrl = null;
+    }
+    if (avatarFileInput) {
+      avatarFileInput.value = '';
+    }
+  }
+
+  if (btnCloseCropModal) btnCloseCropModal.addEventListener('click', closeCropModal);
+  if (btnCancelCropModal) btnCancelCropModal.addEventListener('click', closeCropModal);
+  if (modalCropAvatar) {
+    modalCropAvatar.addEventListener('click', (e) => {
+      if (e.target === modalCropAvatar) closeCropModal();
+    });
+  }
+
+  // Zoom controls
+  if (btnCropZoomIn) {
+    btnCropZoomIn.addEventListener('click', () => {
+      if (cropperInstance) cropperInstance.zoom(0.1);
+    });
+  }
+  if (btnCropZoomOut) {
+    btnCropZoomOut.addEventListener('click', () => {
+      if (cropperInstance) cropperInstance.zoom(-0.1);
+    });
+  }
+  if (cropZoomSlider) {
+    cropZoomSlider.addEventListener('input', (e) => {
+      if (cropperInstance) {
+        const val = parseFloat(e.target.value);
+        cropperInstance.zoomTo(val);
+      }
+    });
+  }
+
+  // Rotation controls
+  function updateRotation() {
+    if (!cropperInstance) return;
+    const fineAngle = cropRotateSlider ? parseInt(cropRotateSlider.value, 10) : 0;
+    if (cropRotateVal) cropRotateVal.textContent = `${fineAngle}°`;
+    cropperInstance.rotateTo(baseRotationAngle + fineAngle);
+  }
+
+  if (btnCropRotateLeft) {
+    btnCropRotateLeft.addEventListener('click', () => {
+      baseRotationAngle = (baseRotationAngle - 90) % 360;
+      updateRotation();
+    });
+  }
+  if (btnCropRotateRight) {
+    btnCropRotateRight.addEventListener('click', () => {
+      baseRotationAngle = (baseRotationAngle + 90) % 360;
+      updateRotation();
+    });
+  }
+  if (cropRotateSlider) {
+    cropRotateSlider.addEventListener('input', updateRotation);
+  }
+
+  // Flip controls
+  if (btnCropFlipX) {
+    btnCropFlipX.addEventListener('click', () => {
+      if (!cropperInstance) return;
+      currentScaleX = -currentScaleX;
+      cropperInstance.scaleX(currentScaleX);
+    });
+  }
+  if (btnCropFlipY) {
+    btnCropFlipY.addEventListener('click', () => {
+      if (!cropperInstance) return;
+      currentScaleY = -currentScaleY;
+      cropperInstance.scaleY(currentScaleY);
+    });
+  }
+
+  // Reset
+  if (btnCropReset) {
+    btnCropReset.addEventListener('click', () => {
+      if (!cropperInstance) return;
+      cropperInstance.reset();
+      resetCropControls();
+    });
+  }
+
+  // Aspect ratio toggles
+  if (btnAspect11) {
+    btnAspect11.addEventListener('click', () => {
+      if (!cropperInstance) return;
+      cropperInstance.setAspectRatio(1);
+      btnAspect11.classList.add('active');
+      if (btnAspectFree) btnAspectFree.classList.remove('active');
+      if (cropperStage) cropperStage.classList.add('cropper-circular-mode');
+    });
+  }
+  if (btnAspectFree) {
+    btnAspectFree.addEventListener('click', () => {
+      if (!cropperInstance) return;
+      cropperInstance.setAspectRatio(NaN);
+      btnAspectFree.classList.add('active');
+      if (btnAspect11) btnAspect11.classList.remove('active');
+      if (cropperStage) cropperStage.classList.remove('cropper-circular-mode');
+    });
+  }
+
+  // Apply & Upload
+  if (btnApplyCrop) {
+    btnApplyCrop.addEventListener('click', () => {
+      if (!cropperInstance) return;
+
+      const canvas = cropperInstance.getCroppedCanvas({
+        width: 512,
+        height: 512,
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high'
+      });
+
+      if (!canvas) {
+        showToast('Failed to crop image', true);
+        return;
+      }
+
+      btnApplyCrop.disabled = true;
+      btnApplyCrop.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Uploading...';
+
+      const format = currentFileMime === 'image/png' ? 'image/png' : 'image/jpeg';
+      const ext = format === 'image/png' ? '.png' : '.jpg';
+
+      canvas.toBlob(async (blob) => {
+        if (!blob) {
+          showToast('Image processing error', true);
+          btnApplyCrop.disabled = false;
+          btnApplyCrop.innerHTML = '<i class="fas fa-check"></i> Crop & Apply';
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', blob, 'avatar' + ext);
+
+        try {
+          const res = await fetch('/api/admin/upload', {
+            method: 'POST',
+            body: formData
+          });
+          const data = await res.json();
+          if (res.ok && data.fileUrl) {
+            profileAvatarUrlInput.value = data.fileUrl;
+            updateAvatarPreview(data.fileUrl);
+            closeCropModal();
+            showToast('Avatar cropped & uploaded! Remember to save profile.');
+          } else {
+            showToast(data.error || 'Upload failed', true);
+          }
+        } catch (err) {
+          showToast('Upload failed due to network error', true);
+        } finally {
+          btnApplyCrop.disabled = false;
+          btnApplyCrop.innerHTML = '<i class="fas fa-check"></i> Crop & Apply';
+        }
+      }, format, 0.92);
+    });
+  }
+
+  // Avatar file input change handler
+  avatarFileInput.addEventListener('change', () => {
     if (!avatarFileInput.files || !avatarFileInput.files[0]) return;
     const file = avatarFileInput.files[0];
-    const formData = new FormData();
-    formData.append('file', file);
 
-    try {
-      showToast('Uploading image...');
-      const res = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formData
-      });
-      const data = await res.json();
-      if (res.ok && data.fileUrl) {
-        profileAvatarUrlInput.value = data.fileUrl;
-        updateAvatarPreview(data.fileUrl);
-        showToast('Image uploaded successfully! Remember to save profile.');
-      } else {
-        showToast(data.error || 'Upload failed', true);
-      }
-    } catch (err) {
-      showToast('Upload error', true);
+    // Check size limit (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      showToast('Image must be under 10MB', true);
+      avatarFileInput.value = '';
+      return;
     }
+
+    if (!file.type.startsWith('image/')) {
+      showToast('Please select a valid image file', true);
+      avatarFileInput.value = '';
+      return;
+    }
+
+    if (activeCropObjectUrl) {
+      URL.revokeObjectURL(activeCropObjectUrl);
+    }
+    activeCropObjectUrl = URL.createObjectURL(file);
+    openCropModal(activeCropObjectUrl, file.type);
   });
+
+  // Crop & Adjust button for current avatar
+  if (btnCropAvatarTrigger) {
+    btnCropAvatarTrigger.addEventListener('click', () => {
+      const currentUrl = profileAvatarUrlInput.value.trim();
+      if (currentUrl) {
+        openCropModal(currentUrl, 'image/jpeg');
+      } else {
+        avatarFileInput.click();
+      }
+    });
+  }
+
+  // Remove avatar button
+  if (btnRemoveAvatar) {
+    btnRemoveAvatar.addEventListener('click', () => {
+      profileAvatarUrlInput.value = '';
+      updateAvatarPreview('');
+      showToast('Avatar removed. Click Save Profile to apply.');
+    });
+  }
 
   document.getElementById('btn-save-profile').addEventListener('click', async () => {
     const payload = {

@@ -785,3 +785,239 @@ input:checked + .slider:before {
   opacity: 1;
   transform: translateY(0) scale(1);
 }
+
+/* ==========================================================================
+   AVATAR CROP & ADJUST MODAL
+   ========================================================================== */
+
+.modal-crop-content {
+  max-width: 680px;
+  width: 95%;
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  overflow: hidden;
+}
+
+.crop-modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+  max-height: calc(92vh - 130px);
+  padding-right: 4px;
+}
+
+.cropper-stage-wrapper {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+
+.cropper-stage {
+  flex: 1;
+  min-width: 0;
+  height: 330px;
+  max-height: 48vh;
+  background: #090d16;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.cropper-stage img {
+  max-width: 100%;
+  display: block;
+}
+
+/* Cropper Circular Mode */
+.cropper-circular-mode .cropper-view-box,
+.cropper-circular-mode .cropper-face {
+  border-radius: 50%;
+}
+
+.cropper-circular-mode .cropper-view-box {
+  outline: 2px solid var(--primary);
+  outline-color: var(--primary);
+}
+
+.cropper-line,
+.cropper-point {
+  background-color: var(--primary) !important;
+}
+
+.cropper-point.point-se {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+/* Live Circular Preview Card */
+.crop-preview-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 110px;
+  flex-shrink: 0;
+}
+
+.crop-preview-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.crop-circular-preview {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid var(--primary);
+  background: var(--bg-card);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
+
+.crop-preview-hint {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Controls Panel */
+.crop-controls-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+}
+
+.crop-control-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.crop-control-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  min-width: 68px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-crop-tool {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: all var(--m3-motion-duration-short) ease;
+}
+
+.btn-crop-tool:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.crop-slider {
+  flex: 1;
+  min-width: 110px;
+  accent-color: var(--primary);
+  cursor: pointer;
+  height: 6px;
+  border-radius: 3px;
+}
+
+.crop-slider-val {
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: monospace;
+  color: var(--primary);
+  min-width: 34px;
+  text-align: right;
+}
+
+.crop-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+}
+
+.crop-btn-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-crop-action {
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all var(--m3-motion-duration-short) ease;
+}
+
+.btn-crop-action:hover {
+  color: var(--text-main);
+  border-color: var(--primary);
+}
+
+.btn-crop-action.active {
+  background: var(--primary-light);
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+@media (max-width: 640px) {
+  .cropper-stage-wrapper {
+    flex-direction: column;
+  }
+  .crop-preview-card {
+    flex-direction: row;
+    width: 100%;
+    justify-content: center;
+  }
+  .crop-circular-preview {
+    width: 68px;
+    height: 68px;
+  }
+  .cropper-stage {
+    height: 240px;
+  }
+}
