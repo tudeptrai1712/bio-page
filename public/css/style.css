@@ -514,6 +514,53 @@ body {
   text-align: center;
   font-size: 0.85rem;
   color: var(--m3-sys-color-on-surface-variant);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.bio-page-footer p {
+  margin: 0;
+}
+
+.bio-custom-footer {
+  color: var(--m3-sys-color-on-surface-variant);
+  opacity: 0.9;
+}
+
+.bio-permanent-footer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  color: var(--m3-sys-color-on-surface-variant);
+  opacity: 0.85;
+  transition: opacity var(--m3-motion-duration-short) ease;
+}
+
+.bio-permanent-footer:hover {
+  opacity: 1;
+}
+
+.bio-permanent-footer a.permanent-footer-link {
+  color: var(--m3-sys-color-on-surface);
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: color var(--m3-motion-duration-short) ease;
+}
+
+.bio-permanent-footer a.permanent-footer-link:hover {
+  color: var(--m3-sys-color-primary);
+  text-decoration: underline;
+}
+
+.bio-permanent-footer a.permanent-footer-link i {
+  font-size: 1rem;
 }
 
 .bio-toast {
