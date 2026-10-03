@@ -135,11 +135,9 @@ body {
 
 .brand-title {
   font-family: var(--font-brand);
-  font-size: 1.02rem;
+  font-size: 1.15rem;
   font-weight: 800;
-  letter-spacing: -0.3px;
-  line-height: 1.25;
-  word-break: break-word;
+  letter-spacing: -0.5px;
 }
 
 .nav-menu {
