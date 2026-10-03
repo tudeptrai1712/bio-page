@@ -257,7 +257,7 @@ async function renderPublicBioPage() {
   const handleFormatted = escapeHtml(rawHandle.startsWith('@') ? rawHandle : `@${rawHandle}`);
   const initial = rawHandle.replace('@', '').trim().charAt(0).toUpperCase() || 'U';
   const bioText = escapeHtml(profile.bio || profile.tagline || '');
-  const footerText = escapeHtml(profile.footer_text || 'Built with Self-Hosted Bio Page');
+  const customFooterText = escapeHtml(profile.footer_text || '');
   const seoTitle = escapeHtml(profile.seo_title || `${displayName || handleFormatted} | Bio Page`);
   const seoDesc = escapeHtml(profile.seo_description || 'Personal links, contact details, and portfolio');
 
@@ -407,7 +407,10 @@ async function renderPublicBioPage() {
 
     <!-- Footer -->
     <footer class="bio-page-footer">
-      <p>${footerText}</p>
+      ${customFooterText ? `<p class="bio-custom-footer">${customFooterText}</p>` : ''}
+      <p class="bio-permanent-footer">
+        Build with <a href="https://github.com/tudeptrai1712/bio-page" target="_blank" rel="noopener noreferrer" class="permanent-footer-link"><i class="fab fa-github"></i> tudeptrai1712/bio-page</a>
+      </p>
     </footer>
   </main>
 
