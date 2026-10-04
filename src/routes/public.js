@@ -12,8 +12,16 @@ const { publicRateLimiter } = require('../middleware/rateLimit');
 const { Logger } = require('../logger');
 const { generateThemeCss } = require('../renderer');
 
+const banksData = require('../data/banks.json');
+
 // Apply public rate limiter (120 req/min - ASVS V13)
 router.use(publicRateLimiter);
+
+// Get list of Vietnamese banks for VietQR (served from local data)
+router.get('/banks', (req, res) => {
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+  res.json(banksData);
+});
 
 // Dynamic Theme CSS (served as external CSS file for strict CSP Level 3)
 router.get('/theme.css', async (req, res) => {
@@ -58,7 +66,11 @@ router.get('/profile', async (req, res) => {
         theme, accent_color, background_type, background_value,
         seo_title, seo_description, footer_text,
         contact_email, contact_phone, contact_whatsapp, contact_telegram, contact_signal, contact_zalo,
-        color_mode, show_share_button, allow_password_login
+        color_mode, show_share_button, allow_password_login,
+        donations_enabled, donation_title, donation_desc,
+        donation_momo_enabled, donation_momo_title, donation_momo_url, donation_momo_desc,
+        donation_paypal_enabled, donation_paypal_username, donation_paypal_currency, donation_paypal_amounts,
+        donation_vietqr_enabled, donation_vietqr_bank, donation_vietqr_acc, donation_vietqr_holder, donation_vietqr_template, donation_vietqr_default_des, donation_vietqr_mask_acc
       FROM profile WHERE id = 1
     `).get();
     const links = db.prepare('SELECT id, title, url, description, icon, is_highlighted, display_order FROM links WHERE enabled = 1 ORDER BY display_order ASC, id ASC').all();

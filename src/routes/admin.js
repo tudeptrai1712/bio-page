@@ -48,7 +48,25 @@ router.put('/profile', async (req, res) => {
     contact_zalo,
     color_mode,
     show_share_button,
-    allow_password_login
+    allow_password_login,
+    donations_enabled,
+    donation_title,
+    donation_desc,
+    donation_momo_enabled,
+    donation_momo_title,
+    donation_momo_url,
+    donation_momo_desc,
+    donation_paypal_enabled,
+    donation_paypal_username,
+    donation_paypal_currency,
+    donation_paypal_amounts,
+    donation_vietqr_enabled,
+    donation_vietqr_bank,
+    donation_vietqr_acc,
+    donation_vietqr_holder,
+    donation_vietqr_template,
+    donation_vietqr_default_des,
+    donation_vietqr_mask_acc
   } = req.body;
 
   // Validate URL schemes for avatar, banner, and background if URLs (ASVS V5)
@@ -78,10 +96,10 @@ router.put('/profile', async (req, res) => {
       }
     }
 
-    const current = db.prepare('SELECT allow_password_login FROM profile WHERE id = 1').get();
+    const current = db.prepare('SELECT * FROM profile WHERE id = 1').get() || {};
     const finalAllowPassword = allow_password_login !== undefined
       ? (allow_password_login ? 1 : 0)
-      : (current ? current.allow_password_login : 1);
+      : (current.allow_password_login !== undefined ? current.allow_password_login : 1);
 
     db.prepare(`
       UPDATE profile SET
@@ -107,31 +125,67 @@ router.put('/profile', async (req, res) => {
         color_mode = ?,
         show_share_button = ?,
         allow_password_login = ?,
+        donations_enabled = ?,
+        donation_title = ?,
+        donation_desc = ?,
+        donation_momo_enabled = ?,
+        donation_momo_title = ?,
+        donation_momo_url = ?,
+        donation_momo_desc = ?,
+        donation_paypal_enabled = ?,
+        donation_paypal_username = ?,
+        donation_paypal_currency = ?,
+        donation_paypal_amounts = ?,
+        donation_vietqr_enabled = ?,
+        donation_vietqr_bank = ?,
+        donation_vietqr_acc = ?,
+        donation_vietqr_holder = ?,
+        donation_vietqr_template = ?,
+        donation_vietqr_default_des = ?,
+        donation_vietqr_mask_acc = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = 1
     `).run(
-      (name || '').substring(0, 100),
-      (handle || '').substring(0, 50),
-      (tagline || '').substring(0, 200),
-      (bio || '').substring(0, 1000),
-      sanitizeUrl(avatar_url),
-      sanitizeUrl(banner_url),
-      (theme || 'classic-gray').substring(0, 50),
-      (accent_color || '#818cf8').substring(0, 20),
-      (background_type || 'preset').substring(0, 20),
-      (background_value || 'classic-gray').substring(0, 500),
-      (seo_title || 'My Bio Page').substring(0, 100),
-      (seo_description || '').substring(0, 300),
-      (footer_text || '').substring(0, 200),
-      (contact_email || '').substring(0, 100),
-      (contact_phone || '').substring(0, 50),
-      (contact_whatsapp || '').substring(0, 100),
-      (contact_telegram || '').substring(0, 100),
-      (contact_signal || '').substring(0, 100),
-      (contact_zalo || '').substring(0, 100),
-      (color_mode || 'auto').substring(0, 10),
-      show_share_button !== undefined ? (show_share_button ? 1 : 0) : 1,
-      finalAllowPassword
+      name !== undefined ? (name || '').substring(0, 100) : (current.name || ''),
+      handle !== undefined ? (handle || '').substring(0, 50) : (current.handle || ''),
+      tagline !== undefined ? (tagline || '').substring(0, 200) : (current.tagline || ''),
+      bio !== undefined ? (bio || '').substring(0, 1000) : (current.bio || ''),
+      avatar_url !== undefined ? sanitizeUrl(avatar_url) : (current.avatar_url || ''),
+      banner_url !== undefined ? sanitizeUrl(banner_url) : (current.banner_url || ''),
+      theme !== undefined ? (theme || 'classic-gray').substring(0, 50) : (current.theme || 'classic-gray'),
+      accent_color !== undefined ? (accent_color || '#818cf8').substring(0, 20) : (current.accent_color || '#818cf8'),
+      background_type !== undefined ? (background_type || 'preset').substring(0, 20) : (current.background_type || 'preset'),
+      background_value !== undefined ? (background_value || 'classic-gray').substring(0, 500) : (current.background_value || 'classic-gray'),
+      seo_title !== undefined ? (seo_title || 'My Bio Page').substring(0, 100) : (current.seo_title || 'My Bio Page'),
+      seo_description !== undefined ? (seo_description || '').substring(0, 300) : (current.seo_description || ''),
+      footer_text !== undefined ? (footer_text || '').substring(0, 200) : (current.footer_text || ''),
+      contact_email !== undefined ? (contact_email || '').substring(0, 100) : (current.contact_email || ''),
+      contact_phone !== undefined ? (contact_phone || '').substring(0, 50) : (current.contact_phone || ''),
+      contact_whatsapp !== undefined ? (contact_whatsapp || '').substring(0, 100) : (current.contact_whatsapp || ''),
+      contact_telegram !== undefined ? (contact_telegram || '').substring(0, 100) : (current.contact_telegram || ''),
+      contact_signal !== undefined ? (contact_signal || '').substring(0, 100) : (current.contact_signal || ''),
+      contact_zalo !== undefined ? (contact_zalo || '').substring(0, 100) : (current.contact_zalo || ''),
+      color_mode !== undefined ? (color_mode || 'auto').substring(0, 10) : (current.color_mode || 'auto'),
+      show_share_button !== undefined ? (show_share_button ? 1 : 0) : (current.show_share_button !== undefined ? current.show_share_button : 1),
+      finalAllowPassword,
+      donations_enabled !== undefined ? (donations_enabled ? 1 : 0) : (current.donations_enabled !== undefined ? current.donations_enabled : 1),
+      donation_title !== undefined ? (donation_title || 'Support & Donations').substring(0, 100) : (current.donation_title || 'Support & Donations'),
+      donation_desc !== undefined ? (donation_desc || '').substring(0, 300) : (current.donation_desc || ''),
+      donation_momo_enabled !== undefined ? (donation_momo_enabled ? 1 : 0) : (current.donation_momo_enabled !== undefined ? current.donation_momo_enabled : 1),
+      donation_momo_title !== undefined ? (donation_momo_title || 'MoMo').substring(0, 100) : (current.donation_momo_title || 'MoMo'),
+      donation_momo_url !== undefined ? (donation_momo_url || '').substring(0, 500) : (current.donation_momo_url || ''),
+      donation_momo_desc !== undefined ? (donation_momo_desc || '').substring(0, 300) : (current.donation_momo_desc || ''),
+      donation_paypal_enabled !== undefined ? (donation_paypal_enabled ? 1 : 0) : (current.donation_paypal_enabled !== undefined ? current.donation_paypal_enabled : 1),
+      donation_paypal_username !== undefined ? (donation_paypal_username || '').replace(/[^a-zA-Z0-9._-]/g, '').substring(0, 100) : (current.donation_paypal_username || ''),
+      donation_paypal_currency !== undefined ? (donation_paypal_currency || 'USD').toUpperCase().replace(/[^A-Z]/g, '').substring(0, 10) : (current.donation_paypal_currency || 'USD'),
+      donation_paypal_amounts !== undefined ? (donation_paypal_amounts || '').substring(0, 100) : (current.donation_paypal_amounts || '5,10,25,50'),
+      donation_vietqr_enabled !== undefined ? (donation_vietqr_enabled ? 1 : 0) : (current.donation_vietqr_enabled !== undefined ? current.donation_vietqr_enabled : 1),
+      donation_vietqr_bank !== undefined ? (donation_vietqr_bank || 'MB').substring(0, 20) : (current.donation_vietqr_bank || 'MB'),
+      donation_vietqr_acc !== undefined ? (donation_vietqr_acc || '').replace(/[^a-zA-Z0-9]/g, '').substring(0, 50) : (current.donation_vietqr_acc || ''),
+      donation_vietqr_holder !== undefined ? (donation_vietqr_holder || '').substring(0, 100) : (current.donation_vietqr_holder || ''),
+      donation_vietqr_template !== undefined ? (donation_vietqr_template || 'compact').substring(0, 30) : (current.donation_vietqr_template || 'compact'),
+      donation_vietqr_default_des !== undefined ? (donation_vietqr_default_des || 'Donate').substring(0, 100) : (current.donation_vietqr_default_des || 'Donate'),
+      donation_vietqr_mask_acc !== undefined ? (donation_vietqr_mask_acc ? 1 : 0) : (current.donation_vietqr_mask_acc !== undefined ? current.donation_vietqr_mask_acc : 0)
     );
 
     // Invalidate Redis Cache
