@@ -304,36 +304,50 @@
 
               <div class="form-grid">
                 <div class="form-group">
-                  <label class="form-label" for="donation-vietqr-bank">Ngân hàng (Vietnamese Bank)</label>
+                  <label class="form-label" for="donation-vietqr-bank">Bank Name (VietQR Supported)</label>
                   <select id="donation-vietqr-bank" class="form-control">
-                    <option value="MB">MBBank - Ngân hàng TMCP Quân đội (MB)</option>
+                    <option value="MB">MBBank - Military Commercial Joint Stock Bank (MB)</option>
                   </select>
                 </div>
                 <div class="form-group">
-                  <label class="form-label" for="donation-vietqr-acc">Số tài khoản</label>
-                  <input type="text" id="donation-vietqr-acc" class="form-control" placeholder="Ví dụ: 0123456789">
+                  <label class="form-label" for="donation-vietqr-acc">Bank Account Number</label>
+                  <input type="text" id="donation-vietqr-acc" class="form-control" placeholder="e.g. 0123456789">
                 </div>
               </div>
 
               <div class="form-grid">
                 <div class="form-group">
-                  <label class="form-label" for="donation-vietqr-holder">Tên chủ tài khoản (Không dấu)</label>
-                  <input type="text" id="donation-vietqr-holder" class="form-control" placeholder="Ví dụ: NGUYEN VAN A">
+                  <label class="form-label" for="donation-vietqr-holder">Account Holder Name (Uppercase, no accents)</label>
+                  <input type="text" id="donation-vietqr-holder" class="form-control" placeholder="e.g. NGUYEN VAN A">
                 </div>
                 <div class="form-group">
-                  <label class="form-label" for="donation-vietqr-template">Mẫu giao diện QR (Template)</label>
+                  <label class="form-label" for="donation-vietqr-template">QR Card Template</label>
                   <select id="donation-vietqr-template" class="form-control">
-                    <option value="compact">Compact (Tiêu chuẩn kèm logo)</option>
-                    <option value="compact2">Compact 2 (Kèm logo & thông tin)</option>
-                    <option value="qr_only">QR Only (Chỉ mã QR tinh gọn)</option>
-                    <option value="print">Print (Khổ in)</option>
+                    <option value="compact">Compact (Standard with bank logo)</option>
+                    <option value="compact2">Compact 2 (With bank logo & details)</option>
+                    <option value="qr_only">QR Only (Minimalist QR code)</option>
+                    <option value="print">Print (Printable layout)</option>
                   </select>
                 </div>
               </div>
 
               <div class="form-group">
-                <label class="form-label" for="donation-vietqr-default-des">Nội dung chuyển khoản mặc định</label>
-                <input type="text" id="donation-vietqr-default-des" class="form-control" placeholder="Ví dụ: Donate hoặc Ung ho">
+                <label class="form-label" for="donation-vietqr-default-des">Default Transfer Note / Message</label>
+                <input type="text" id="donation-vietqr-default-des" class="form-control" placeholder="e.g. Donate or Support">
+              </div>
+
+              <!-- Mask Account Number Toggle -->
+              <div style="background: var(--bg-hover); padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-top: 12px; display: flex; align-items: center; justify-content: space-between;">
+                <div>
+                  <strong style="display: block; font-size: 0.92rem; color: var(--text-main); margin-bottom: 2px;">
+                    <i class="fas fa-eye-slash text-primary"></i> Mask Account Number on Bio Page
+                  </strong>
+                  <small style="color: var(--text-muted);">Mask middle digits (e.g. <code>0385••••712</code>) with an unmask eye button. One-click copy and QR transfers still use the full account number.</small>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="donation-vietqr-mask-acc">
+                  <span class="slider"></span>
+                </label>
               </div>
             </div>
 
@@ -407,13 +421,13 @@
                 </div>
                 <div class="form-group">
                   <label class="form-label" for="donation-momo-url">MoMo Link or Phone / Account</label>
-                  <input type="text" id="donation-momo-url" class="form-control" placeholder="https://me.momo.vn/... hoặc số điện thoại">
+                  <input type="text" id="donation-momo-url" class="form-control" placeholder="https://me.momo.vn/... or phone number">
                 </div>
               </div>
 
               <div class="form-group">
                 <label class="form-label" for="donation-momo-desc">Short Instruction / Note</label>
-                <input type="text" id="donation-momo-desc" class="form-control" placeholder="Scan mã QR hoặc chuyển tiền qua ví MoMo">
+                <input type="text" id="donation-momo-desc" class="form-control" placeholder="Scan QR code or transfer to mobile wallet">
               </div>
             </div>
           </form>

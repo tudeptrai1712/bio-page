@@ -710,13 +710,13 @@ body {
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
-  width: 190px;
+  width: 168px;
 }
 
 .vietqr-img-wrapper {
   position: relative;
-  width: 190px;
-  height: 190px;
+  width: 168px;
+  height: 168px;
   background: #ffffff;
   padding: 6px;
   border-radius: var(--m3-shape-corner-medium);
@@ -786,25 +786,35 @@ body {
 .bank-detail-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: baseline;
   font-size: 0.83rem;
-  gap: 8px;
+  gap: 10px;
 }
 
 .detail-label {
   color: var(--m3-sys-color-on-surface-variant);
   font-weight: 500;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .detail-val {
   color: var(--card-text);
   text-align: right;
-  word-break: break-all;
+  word-break: normal;
+  overflow-wrap: break-word;
+  white-space: normal;
+  line-height: 1.35;
+  min-width: 0;
 }
 
 .detail-val.font-mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .detail-val.font-semibold {
@@ -813,6 +823,24 @@ body {
 
 .detail-val.uppercase {
   text-transform: uppercase;
+}
+
+.btn-toggle-mask-acc {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--m3-sys-color-on-surface-variant);
+  padding: 2px 4px;
+  margin-left: 4px;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  transition: color 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.btn-toggle-mask-acc:hover {
+  color: var(--m3-sys-color-primary);
 }
 
 .vietqr-input-group {

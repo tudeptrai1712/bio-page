@@ -88,6 +88,7 @@ function initDatabase() {
       donation_vietqr_holder TEXT DEFAULT '',
       donation_vietqr_template TEXT DEFAULT 'compact',
       donation_vietqr_default_des TEXT DEFAULT 'Donate',
+      donation_vietqr_mask_acc INTEGER DEFAULT 0,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -151,6 +152,7 @@ function initDatabase() {
   try { db.exec("ALTER TABLE profile ADD COLUMN donation_vietqr_holder TEXT DEFAULT ''"); } catch(e){}
   try { db.exec("ALTER TABLE profile ADD COLUMN donation_vietqr_template TEXT DEFAULT 'compact'"); } catch(e){}
   try { db.exec("ALTER TABLE profile ADD COLUMN donation_vietqr_default_des TEXT DEFAULT 'Donate'"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donation_vietqr_mask_acc INTEGER DEFAULT 0"); } catch(e){}
 
   // Seed default admin if not exists
   const userCount = db.prepare('SELECT COUNT(*) AS count FROM users').get().count;

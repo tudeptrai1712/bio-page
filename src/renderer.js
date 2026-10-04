@@ -239,6 +239,17 @@ function escapeHtml(str) {
     .replace(/'/g, '&#039;');
 }
 
+function maskAccountNumber(acc) {
+  if (!acc) return '';
+  const s = String(acc).trim();
+  if (s.length <= 4) return s;
+  if (s.length <= 6) return s.slice(0, 2) + '••••' + s.slice(-2);
+  const startLen = s.length >= 9 ? 4 : 3;
+  const endLen = 3;
+  const maskLen = Math.max(s.length - startLen - endLen, 3);
+  return s.slice(0, startLen) + '•'.repeat(maskLen) + s.slice(-endLen);
+}
+
 // -------------------------------------------------------------
 // 3. SERVER-SIDE TEMPLATE RENDERER
 // -------------------------------------------------------------
@@ -380,6 +391,10 @@ async function renderPublicBioPage() {
       momoUrl = 'https://' + momoUrl;
     }
 
+    const shouldMaskAcc = !!profile.donation_vietqr_mask_acc;
+    const rawAcc = (profile.donation_vietqr_acc || '').trim();
+    const maskedAcc = shouldMaskAcc ? maskAccountNumber(rawAcc) : rawAcc;
+
     donationSectionHtml = `
       <!-- Donation Drop-down Section -->
       <section class="bio-donation-section" aria-label="Support and Donations">
@@ -425,7 +440,9 @@ async function renderPublicBioPage() {
                 ${isVietqrEnabled ? `
                   <div class="donation-panel ${defaultMethod === 'vietqr' ? 'active' : ''}" id="panel-donation-vietqr" role="tabpanel"
                        data-bank="${escapeHtml(profile.donation_vietqr_bank || 'MB')}"
-                       data-acc="${escapeHtml(profile.donation_vietqr_acc || '')}"
+                       data-acc="${escapeHtml(rawAcc)}"
+                       data-masked-acc="${escapeHtml(maskedAcc)}"
+                       data-is-masked="${shouldMaskAcc ? '1' : '0'}"
                        data-holder="${escapeHtml(profile.donation_vietqr_holder || '')}"
                        data-template="${escapeHtml(profile.donation_vietqr_template || 'compact')}"
                        data-default-des="${escapeHtml(profile.donation_vietqr_default_des || 'Donate')}">
@@ -440,11 +457,11 @@ async function renderPublicBioPage() {
                                loading="lazy">
                         </div>
                         <div class="vietqr-quick-actions">
-                          <button type="button" class="btn-qr-action m3-ripple-surface" id="btn-copy-acc" data-acc="${escapeHtml(profile.donation_vietqr_acc || '')}">
-                            <i class="fas fa-copy"></i> <span>Copy STK</span>
+                          <button type="button" class="btn-qr-action m3-ripple-surface" id="btn-copy-acc" data-acc="${escapeHtml(rawAcc)}" title="Copy full account number">
+                            <i class="fas fa-copy"></i> <span>Copy Acc</span>
                           </button>
-                          <button type="button" class="btn-qr-action m3-ripple-surface" id="btn-copy-all-vietqr">
-                            <i class="fas fa-file-invoice"></i> <span>Copy TT</span>
+                          <button type="button" class="btn-qr-action m3-ripple-surface" id="btn-copy-all-vietqr" title="Copy all transfer details">
+                            <i class="fas fa-file-invoice"></i> <span>Copy Details</span>
                           </button>
                         </div>
                       </div>
@@ -452,38 +469,45 @@ async function renderPublicBioPage() {
                       <div class="vietqr-controls-container">
                         <div class="bank-details-card">
                           <div class="bank-detail-row">
-                            <span class="detail-label">Ngân hàng:</span>
+                            <span class="detail-label">Bank:</span>
                             <span class="detail-val font-semibold" id="display-vietqr-bank">${escapeHtml(bankDisplay)}</span>
                           </div>
                           <div class="bank-detail-row">
-                            <span class="detail-label">Số tài khoản:</span>
-                            <span class="detail-val font-mono font-semibold" id="display-vietqr-acc">${escapeHtml(profile.donation_vietqr_acc || '')}</span>
+                            <span class="detail-label">Account No:</span>
+                            <span class="detail-val font-mono font-semibold" id="display-vietqr-acc-box">
+                              <span id="vietqr-acc-num-text">${escapeHtml(maskedAcc)}</span>
+                              ${shouldMaskAcc ? `
+                                <button type="button" class="btn-toggle-mask-acc" id="btn-toggle-mask-acc" title="Show / Hide account number" aria-label="Show or hide account number">
+                                  <i class="fas fa-eye" id="icon-mask-acc"></i>
+                                </button>
+                              ` : ''}
+                            </span>
                           </div>
                           ${profile.donation_vietqr_holder ? `
                           <div class="bank-detail-row">
-                            <span class="detail-label">Chủ tài khoản:</span>
+                            <span class="detail-label">Holder:</span>
                             <span class="detail-val uppercase font-semibold" id="display-vietqr-holder">${escapeHtml(profile.donation_vietqr_holder)}</span>
                           </div>` : ''}
                         </div>
 
                         <div class="vietqr-input-group">
-                          <label class="vietqr-field-label">Số tiền (VNĐ):</label>
+                          <label class="vietqr-field-label">Amount (VND):</label>
                           <div class="quick-amounts-bar" id="vietqr-quick-amounts">
-                            <button type="button" class="amount-chip" data-amount="10000">10.000₫</button>
-                            <button type="button" class="amount-chip" data-amount="20000">20.000₫</button>
-                            <button type="button" class="amount-chip" data-amount="50000">50.000₫</button>
-                            <button type="button" class="amount-chip" data-amount="100000">100.000₫</button>
-                            <button type="button" class="amount-chip" data-amount="200000">200.000₫</button>
+                            <button type="button" class="amount-chip" data-amount="10000">10,000 VND</button>
+                            <button type="button" class="amount-chip" data-amount="20000">20,000 VND</button>
+                            <button type="button" class="amount-chip" data-amount="50000">50,000 VND</button>
+                            <button type="button" class="amount-chip" data-amount="100000">100,000 VND</button>
+                            <button type="button" class="amount-chip" data-amount="200000">200,000 VND</button>
                           </div>
                           <div class="custom-amount-wrapper">
-                            <input type="number" id="input-vietqr-amount" class="donation-input" placeholder="Nhập số tiền tuỳ chọn (VNĐ)" min="0" step="1000">
-                            <span class="input-currency-badge">VNĐ</span>
+                            <input type="number" id="input-vietqr-amount" class="donation-input" placeholder="Enter custom amount (VND)" min="0" step="1000">
+                            <span class="input-currency-badge">VND</span>
                           </div>
                         </div>
 
                         <div class="vietqr-input-group">
-                          <label class="vietqr-field-label" for="input-vietqr-msg">Nội dung chuyển khoản / Lời nhắn:</label>
-                          <input type="text" id="input-vietqr-msg" class="donation-input" value="${escapeHtml(profile.donation_vietqr_default_des || 'Donate')}" placeholder="Lời nhắn hoặc tên bạn" maxlength="100">
+                          <label class="vietqr-field-label" for="input-vietqr-msg">Transfer Note / Message:</label>
+                          <input type="text" id="input-vietqr-msg" class="donation-input" value="${escapeHtml(profile.donation_vietqr_default_des || 'Donate')}" placeholder="Message or your name" maxlength="100">
                         </div>
                       </div>
                     </div>

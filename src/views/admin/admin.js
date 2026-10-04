@@ -929,6 +929,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const inputHolder = document.getElementById('donation-vietqr-holder');
     const selectTemplate = document.getElementById('donation-vietqr-template');
     const inputDefaultDes = document.getElementById('donation-vietqr-default-des');
+    const toggleMaskAcc = document.getElementById('donation-vietqr-mask-acc');
 
     const togglePaypal = document.getElementById('donation-paypal-enabled');
     const inputPaypalUser = document.getElementById('donation-paypal-username');
@@ -950,6 +951,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (inputHolder) inputHolder.value = profile.donation_vietqr_holder || '';
     if (selectTemplate && profile.donation_vietqr_template) selectTemplate.value = profile.donation_vietqr_template;
     if (inputDefaultDes) inputDefaultDes.value = profile.donation_vietqr_default_des || 'Donate';
+    if (toggleMaskAcc) toggleMaskAcc.checked = profile.donation_vietqr_mask_acc === 1;
 
     if (togglePaypal) togglePaypal.checked = profile.donation_paypal_enabled !== 0;
     if (inputPaypalUser) inputPaypalUser.value = profile.donation_paypal_username || '';
@@ -976,6 +978,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       const inputHolder = document.getElementById('donation-vietqr-holder');
       const selectTemplate = document.getElementById('donation-vietqr-template');
       const inputDefaultDes = document.getElementById('donation-vietqr-default-des');
+      const toggleMaskAcc = document.getElementById('donation-vietqr-mask-acc');
 
       const togglePaypal = document.getElementById('donation-paypal-enabled');
       const inputPaypalUser = document.getElementById('donation-paypal-username');
@@ -998,6 +1001,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         donation_vietqr_holder: inputHolder ? inputHolder.value.trim().toUpperCase() : '',
         donation_vietqr_template: selectTemplate ? selectTemplate.value : 'compact',
         donation_vietqr_default_des: inputDefaultDes ? inputDefaultDes.value.trim() : 'Donate',
+        donation_vietqr_mask_acc: toggleMaskAcc ? (toggleMaskAcc.checked ? 1 : 0) : 0,
         donation_paypal_enabled: togglePaypal ? (togglePaypal.checked ? 1 : 0) : 1,
         donation_paypal_username: inputPaypalUser ? inputPaypalUser.value.trim().replace(/^https:\/\/paypal\.me\//i, '').replace(/^@/, '') : '',
         donation_paypal_currency: selectPaypalCurrency ? selectPaypalCurrency.value : 'USD',

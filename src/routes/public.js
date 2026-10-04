@@ -70,7 +70,7 @@ router.get('/profile', async (req, res) => {
         donations_enabled, donation_title, donation_desc,
         donation_momo_enabled, donation_momo_title, donation_momo_url, donation_momo_desc,
         donation_paypal_enabled, donation_paypal_username, donation_paypal_currency, donation_paypal_amounts,
-        donation_vietqr_enabled, donation_vietqr_bank, donation_vietqr_acc, donation_vietqr_holder, donation_vietqr_template, donation_vietqr_default_des
+        donation_vietqr_enabled, donation_vietqr_bank, donation_vietqr_acc, donation_vietqr_holder, donation_vietqr_template, donation_vietqr_default_des, donation_vietqr_mask_acc
       FROM profile WHERE id = 1
     `).get();
     const links = db.prepare('SELECT id, title, url, description, icon, is_highlighted, display_order FROM links WHERE enabled = 1 ORDER BY display_order ASC, id ASC').all();

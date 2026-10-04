@@ -65,7 +65,8 @@ router.put('/profile', async (req, res) => {
     donation_vietqr_acc,
     donation_vietqr_holder,
     donation_vietqr_template,
-    donation_vietqr_default_des
+    donation_vietqr_default_des,
+    donation_vietqr_mask_acc
   } = req.body;
 
   // Validate URL schemes for avatar, banner, and background if URLs (ASVS V5)
@@ -141,6 +142,7 @@ router.put('/profile', async (req, res) => {
         donation_vietqr_holder = ?,
         donation_vietqr_template = ?,
         donation_vietqr_default_des = ?,
+        donation_vietqr_mask_acc = ?,
         updated_at = CURRENT_TIMESTAMP
       WHERE id = 1
     `).run(
@@ -182,7 +184,8 @@ router.put('/profile', async (req, res) => {
       donation_vietqr_acc !== undefined ? (donation_vietqr_acc || '').replace(/[^a-zA-Z0-9]/g, '').substring(0, 50) : (current.donation_vietqr_acc || ''),
       donation_vietqr_holder !== undefined ? (donation_vietqr_holder || '').substring(0, 100) : (current.donation_vietqr_holder || ''),
       donation_vietqr_template !== undefined ? (donation_vietqr_template || 'compact').substring(0, 30) : (current.donation_vietqr_template || 'compact'),
-      donation_vietqr_default_des !== undefined ? (donation_vietqr_default_des || 'Donate').substring(0, 100) : (current.donation_vietqr_default_des || 'Donate')
+      donation_vietqr_default_des !== undefined ? (donation_vietqr_default_des || 'Donate').substring(0, 100) : (current.donation_vietqr_default_des || 'Donate'),
+      donation_vietqr_mask_acc !== undefined ? (donation_vietqr_mask_acc ? 1 : 0) : (current.donation_vietqr_mask_acc !== undefined ? current.donation_vietqr_mask_acc : 0)
     );
 
     // Invalidate Redis Cache

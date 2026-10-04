@@ -236,11 +236,38 @@ document.addEventListener('DOMContentLoaded', () => {
         inputMsg.addEventListener('input', debounceUpdateVietqr);
       }
 
+      // Eye toggle for masked account number
+      const btnToggleMask = document.getElementById('btn-toggle-mask-acc');
+      const textAccNum = document.getElementById('vietqr-acc-num-text');
+      const iconMaskAcc = document.getElementById('icon-mask-acc');
+      let isMaskedShowing = panelVietqr.getAttribute('data-is-masked') === '1';
+
+      if (btnToggleMask && textAccNum) {
+        btnToggleMask.addEventListener('click', () => {
+          isMaskedShowing = !isMaskedShowing;
+          if (isMaskedShowing) {
+            textAccNum.textContent = panelVietqr.getAttribute('data-masked-acc') || acc;
+            if (iconMaskAcc) {
+              iconMaskAcc.classList.remove('fa-eye-slash');
+              iconMaskAcc.classList.add('fa-eye');
+            }
+            btnToggleMask.setAttribute('title', 'Show account number');
+          } else {
+            textAccNum.textContent = acc;
+            if (iconMaskAcc) {
+              iconMaskAcc.classList.remove('fa-eye');
+              iconMaskAcc.classList.add('fa-eye-slash');
+            }
+            btnToggleMask.setAttribute('title', 'Hide account number');
+          }
+        });
+      }
+
       if (btnCopyAcc) {
         btnCopyAcc.addEventListener('click', () => {
           const accNum = btnCopyAcc.getAttribute('data-acc') || acc;
           navigator.clipboard.writeText(accNum).then(() => {
-            showToast('Đã sao chép số tài khoản! 📋');
+            showToast('Account number copied to clipboard! 📋');
           });
         });
       }
@@ -251,13 +278,13 @@ document.addEventListener('DOMContentLoaded', () => {
           const amt = parseInt(rawAmt, 10) || 0;
           const msg = inputMsg ? inputMsg.value.trim() : '';
           const bankDisplay = document.getElementById('display-vietqr-bank')?.textContent || bank;
-          let text = `Ngân hàng: ${bankDisplay}\nSố tài khoản: ${acc}`;
-          if (holder) text += `\nChủ tài khoản: ${holder}`;
-          if (amt > 0) text += `\nSố tiền: ${amt.toLocaleString('vi-VN')} VNĐ`;
-          if (msg) text += `\nNội dung: ${msg}`;
+          let text = `Bank: ${bankDisplay}\nAccount Number: ${acc}`;
+          if (holder) text += `\nAccount Holder: ${holder}`;
+          if (amt > 0) text += `\nAmount: ${amt.toLocaleString('en-US')} VND`;
+          if (msg) text += `\nMessage: ${msg}`;
 
           navigator.clipboard.writeText(text).then(() => {
-            showToast('Đã sao chép thông tin chuyển khoản! 📋');
+            showToast('Transfer details copied to clipboard! 📋');
           });
         });
       }
@@ -337,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
           const val = btnCopyMomo.getAttribute('data-val') || '';
           if (val) {
             navigator.clipboard.writeText(val).then(() => {
-              showToast('Link MoMo đã được sao chép! 📋');
+              showToast('MoMo link copied to clipboard! 📋');
             });
           }
         });
