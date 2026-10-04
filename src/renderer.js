@@ -375,6 +375,11 @@ async function renderPublicBioPage() {
 
     const vietqrInitialUrl = `https://vietqr.app/img?acc=${encodeURIComponent(profile.donation_vietqr_acc || '')}&bank=${encodeURIComponent(profile.donation_vietqr_bank || 'MB')}&amount=0&des=${encodeURIComponent(profile.donation_vietqr_default_des || 'Donate')}&template=${encodeURIComponent(profile.donation_vietqr_template || 'compact')}${profile.donation_vietqr_holder ? '&holder=' + encodeURIComponent(profile.donation_vietqr_holder) : ''}`;
 
+    let momoUrl = (profile.donation_momo_url || '').trim();
+    if (momoUrl && !momoUrl.startsWith('http://') && !momoUrl.startsWith('https://')) {
+      momoUrl = 'https://' + momoUrl;
+    }
+
     donationSectionHtml = `
       <!-- Donation Drop-down Section -->
       <section class="bio-donation-section" aria-label="Support and Donations">
@@ -536,29 +541,40 @@ async function renderPublicBioPage() {
                 ${isMomoEnabled ? `
                   <div class="donation-panel ${defaultMethod === 'momo' ? 'active' : ''}" id="panel-donation-momo" role="tabpanel">
                     <div class="momo-container">
-                      <div class="momo-header-info">
-                        <div class="momo-icon-badge">
-                          <i class="fas fa-wallet"></i>
+                      ${momoUrl ? `
+                        <a href="${escapeHtml(momoUrl)}" target="_blank" rel="noopener noreferrer" class="momo-header-card m3-ripple-surface" title="Open ${escapeHtml(profile.donation_momo_title || 'MoMo')}">
+                          <div class="momo-icon-badge">
+                            <i class="fas fa-wallet"></i>
+                          </div>
+                          <div class="momo-title-info">
+                            <div class="momo-title-text">${escapeHtml(profile.donation_momo_title || 'MoMo')}</div>
+                            <div class="momo-desc-text">${escapeHtml(profile.donation_momo_desc || 'Scan or transfer via MoMo')}</div>
+                          </div>
+                          <div class="momo-arrow-icon">
+                            <i class="fas fa-arrow-up-right-from-square"></i>
+                          </div>
+                        </a>
+                      ` : `
+                        <div class="momo-header-info">
+                          <div class="momo-icon-badge">
+                            <i class="fas fa-wallet"></i>
+                          </div>
+                          <div class="momo-title-info">
+                            <div class="momo-title-text">${escapeHtml(profile.donation_momo_title || 'MoMo')}</div>
+                            <div class="momo-desc-text">${escapeHtml(profile.donation_momo_desc || 'Scan or transfer via MoMo')}</div>
+                          </div>
                         </div>
-                        <div class="momo-title-info">
-                          <div class="momo-title-text">${escapeHtml(profile.donation_momo_title || 'MoMo')}</div>
-                          <div class="momo-desc-text">${escapeHtml(profile.donation_momo_desc || 'Scan QR or send to wallet')}</div>
-                        </div>
-                      </div>
-
-                      <div class="momo-details-box">
-                        <div class="momo-target-val font-mono" id="momo-target-val">${escapeHtml(profile.donation_momo_url || '')}</div>
-                      </div>
+                      `}
 
                       <div class="momo-action-row">
-                        ${profile.donation_momo_url && (profile.donation_momo_url.startsWith('http://') || profile.donation_momo_url.startsWith('https://')) ? `
-                          <a href="${escapeHtml(profile.donation_momo_url)}" target="_blank" rel="noopener noreferrer" class="btn-momo-main m3-ripple-surface">
+                        ${momoUrl ? `
+                          <a href="${escapeHtml(momoUrl)}" target="_blank" rel="noopener noreferrer" class="btn-momo-main m3-ripple-surface">
                             <i class="fas fa-arrow-up-right-from-square"></i> <span>Open ${escapeHtml(profile.donation_momo_title || 'MoMo')}</span>
                           </a>
+                          <button type="button" class="btn-momo-copy m3-ripple-surface" id="btn-copy-momo" data-val="${escapeHtml(momoUrl)}" title="Copy Link">
+                            <i class="fas fa-copy"></i> <span>Copy Link</span>
+                          </button>
                         ` : ''}
-                        <button type="button" class="btn-momo-copy m3-ripple-surface" id="btn-copy-momo" data-val="${escapeHtml(profile.donation_momo_url || '')}">
-                          <i class="fas fa-copy"></i> <span>Copy Info</span>
-                        </button>
                       </div>
                     </div>
                   </div>

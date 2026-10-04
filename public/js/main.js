@@ -334,10 +334,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const btnCopyMomo = document.getElementById('btn-copy-momo');
       if (btnCopyMomo) {
         btnCopyMomo.addEventListener('click', () => {
-          const val = btnCopyMomo.getAttribute('data-val') || document.getElementById('momo-target-val')?.textContent || '';
+          const val = btnCopyMomo.getAttribute('data-val') || '';
           if (val) {
             navigator.clipboard.writeText(val).then(() => {
-              showToast('Đã sao chép thông tin MoMo! 📋');
+              showToast('Link MoMo đã được sao chép! 📋');
             });
           }
         });

@@ -1007,14 +1007,41 @@ body {
   gap: 16px;
 }
 
-.momo-header-info {
+.momo-header-info,
+.momo-header-card {
   display: flex;
   align-items: center;
   gap: 14px;
   background: var(--m3-sys-color-surface-container-highest);
   border: 1px solid var(--card-border);
   border-radius: var(--m3-shape-corner-small);
-  padding: 12px 16px;
+  padding: 14px 16px;
+  text-decoration: none;
+  color: var(--card-text);
+  transition: all var(--m3-motion-duration-short) ease;
+}
+
+.momo-header-card {
+  cursor: pointer;
+}
+
+.momo-header-card:hover {
+  background: var(--card-hover-bg);
+  border-color: #a50064;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(165, 0, 100, 0.25);
+}
+
+.momo-header-card:hover .momo-arrow-icon {
+  color: #a50064;
+  transform: translate(2px, -2px);
+}
+
+.momo-arrow-icon {
+  margin-left: auto;
+  color: var(--m3-sys-color-on-surface-variant);
+  font-size: 1rem;
+  transition: all var(--m3-motion-duration-short) ease;
 }
 
 .momo-icon-badge {
@@ -1035,7 +1062,7 @@ body {
 }
 
 .momo-title-text {
-  font-size: 1rem;
+  font-size: 1.05rem;
   font-weight: 700;
   color: var(--card-text);
 }
@@ -1044,20 +1071,6 @@ body {
   font-size: 0.82rem;
   color: var(--m3-sys-color-on-surface-variant);
   margin-top: 2px;
-}
-
-.momo-details-box {
-  background: var(--card-hover-bg);
-  border: 1px dashed var(--card-border);
-  border-radius: var(--m3-shape-corner-small);
-  padding: 12px 16px;
-  text-align: center;
-}
-
-.momo-target-val {
-  font-size: 0.92rem;
-  color: var(--card-text);
-  word-break: break-all;
 }
 
 .momo-action-row {
