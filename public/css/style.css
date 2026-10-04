@@ -506,6 +506,636 @@ body {
 }
 
 /* ==========================================================================
+   DONATION DROP-DOWN MENU & PAYMENT SLOTS (VIETQR, PAYPAL, MOMO)
+   ========================================================================== */
+
+.bio-donation-section {
+  margin-top: 24px;
+  width: 100%;
+}
+
+.bio-donation-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--m3-shape-corner-medium);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+  transition: border-color var(--m3-motion-duration-medium) ease,
+              box-shadow var(--m3-motion-duration-medium) ease;
+}
+
+.bio-donation-card:hover {
+  border-color: var(--m3-sys-color-primary);
+}
+
+.bio-donation-card.open {
+  border-color: var(--m3-sys-color-primary);
+  box-shadow: var(--m3-elevation-2), 0 0 20px var(--m3-glow-primary);
+}
+
+/* Accordion Toggle Trigger */
+.bio-donation-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  color: var(--card-text);
+  font-family: inherit;
+  transition: background var(--m3-motion-duration-short) ease;
+  position: relative;
+}
+
+.bio-donation-toggle:hover {
+  background: var(--card-hover-bg);
+}
+
+.donation-toggle-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.donation-toggle-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--m3-shape-corner-full);
+  background: var(--m3-sys-color-primary-container);
+  color: var(--m3-sys-color-on-primary-container);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+  transition: transform var(--m3-motion-duration-short) var(--m3-motion-spring-bouncy);
+}
+
+.bio-donation-toggle:hover .donation-toggle-icon {
+  transform: scale(1.08) rotate(-4deg);
+}
+
+.donation-toggle-info {
+  min-width: 0;
+}
+
+.donation-toggle-title {
+  font-family: var(--m3-font-brand);
+  font-size: 1.02rem;
+  font-weight: 700;
+  color: var(--card-text);
+  line-height: 1.3;
+}
+
+.donation-toggle-desc {
+  font-size: 0.82rem;
+  color: var(--m3-sys-color-on-surface-variant);
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.donation-toggle-chevron {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--m3-sys-color-on-surface-variant);
+  font-size: 1rem;
+  transition: transform var(--m3-motion-duration-medium) var(--m3-motion-spring-bouncy),
+              color var(--m3-motion-duration-short) ease;
+  flex-shrink: 0;
+}
+
+.bio-donation-card.open .donation-toggle-chevron {
+  transform: rotate(180deg);
+  color: var(--m3-sys-color-primary);
+}
+
+/* Accordion Expandable Content */
+.donation-accordion-content {
+  max-height: 0;
+  opacity: 0;
+  visibility: hidden;
+  overflow: hidden;
+  transition: max-height 0.45s var(--m3-motion-spring-expressive),
+              opacity 0.35s ease,
+              visibility 0.35s ease;
+  border-top: 1px solid transparent;
+}
+
+.bio-donation-card.open .donation-accordion-content {
+  max-height: 1200px;
+  opacity: 1;
+  visibility: visible;
+  border-top-color: var(--card-border);
+}
+
+.donation-content-inner {
+  padding: 18px 20px 22px;
+}
+
+/* Method Switcher Tabs (Segmented Control) */
+.donation-methods-tabs {
+  display: flex;
+  gap: 8px;
+  background: var(--m3-sys-color-surface-container-highest);
+  padding: 4px;
+  border-radius: var(--m3-shape-corner-medium);
+  margin-bottom: 20px;
+  border: 1px solid var(--card-border);
+}
+
+.donation-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--m3-shape-corner-small);
+  border: none;
+  background: transparent;
+  color: var(--m3-sys-color-on-surface-variant);
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--m3-motion-duration-short) var(--m3-motion-spring-bouncy);
+}
+
+.donation-tab-btn:hover {
+  color: var(--card-text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.donation-tab-btn.active {
+  background: var(--card-bg);
+  color: var(--m3-sys-color-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  font-weight: 700;
+}
+
+/* Donation Panels */
+.donation-panel {
+  display: none;
+  animation: fadeInPanel 0.3s var(--m3-motion-spring-expressive) forwards;
+}
+
+.donation-panel.active {
+  display: block;
+}
+
+@keyframes fadeInPanel {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---------------- VIETQR PANEL ---------------- */
+.vietqr-layout {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.vietqr-qr-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+  width: 190px;
+}
+
+.vietqr-img-wrapper {
+  position: relative;
+  width: 190px;
+  height: 190px;
+  background: #ffffff;
+  padding: 6px;
+  border-radius: var(--m3-shape-corner-medium);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.vietqr-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+  transition: opacity 0.25s ease;
+}
+
+.vietqr-quick-actions {
+  display: flex;
+  gap: 6px;
+  width: 100%;
+}
+
+.btn-qr-action {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 10px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border-radius: var(--m3-shape-corner-small);
+  border: 1px solid var(--card-border);
+  background: var(--card-hover-bg);
+  color: var(--card-text);
+  cursor: pointer;
+  transition: all var(--m3-motion-duration-short) ease;
+}
+
+.btn-qr-action:hover {
+  background: var(--m3-sys-color-primary-container);
+  color: var(--m3-sys-color-on-primary-container);
+  border-color: var(--m3-sys-color-primary);
+}
+
+.vietqr-controls-container {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.bank-details-card {
+  background: var(--m3-sys-color-surface-container-highest);
+  border: 1px solid var(--card-border);
+  border-radius: var(--m3-shape-corner-small);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bank-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.83rem;
+  gap: 8px;
+}
+
+.detail-label {
+  color: var(--m3-sys-color-on-surface-variant);
+  font-weight: 500;
+}
+
+.detail-val {
+  color: var(--card-text);
+  text-align: right;
+  word-break: break-all;
+}
+
+.detail-val.font-mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  letter-spacing: 0.5px;
+}
+
+.detail-val.font-semibold {
+  font-weight: 600;
+}
+
+.detail-val.uppercase {
+  text-transform: uppercase;
+}
+
+.vietqr-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vietqr-field-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--card-text);
+}
+
+/* Quick Amount Preset Chips */
+.quick-amounts-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.amount-chip {
+  padding: 6px 12px;
+  border-radius: var(--m3-shape-corner-full);
+  border: 1px solid var(--card-border);
+  background: var(--card-hover-bg);
+  color: var(--card-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--m3-motion-duration-short) ease;
+}
+
+.amount-chip:hover {
+  border-color: var(--m3-sys-color-primary);
+  background: var(--m3-sys-color-primary-container);
+  color: var(--m3-sys-color-on-primary-container);
+  transform: translateY(-1px);
+}
+
+.amount-chip.active {
+  background: var(--m3-sys-color-primary);
+  color: #ffffff;
+  border-color: var(--m3-sys-color-primary);
+  box-shadow: 0 2px 8px var(--m3-glow-primary);
+}
+
+.custom-amount-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.donation-input {
+  width: 100%;
+  padding: 10px 48px 10px 14px;
+  border-radius: var(--m3-shape-corner-small);
+  border: 1px solid var(--card-border);
+  background: var(--card-hover-bg);
+  color: var(--card-text);
+  font-size: 0.88rem;
+  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.donation-input:focus {
+  outline: none;
+  border-color: var(--m3-sys-color-primary);
+  box-shadow: 0 0 0 3px var(--m3-glow-primary);
+}
+
+.input-currency-badge {
+  position: absolute;
+  right: 12px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--m3-sys-color-on-surface-variant);
+  pointer-events: none;
+}
+
+/* ---------------- PAYPAL PANEL ---------------- */
+.paypal-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.paypal-header-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--m3-sys-color-surface-container-highest);
+  border: 1px solid var(--card-border);
+  border-radius: var(--m3-shape-corner-small);
+  padding: 12px 16px;
+}
+
+.paypal-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--m3-shape-corner-full);
+  background: #0070ba;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+}
+
+.paypal-recipient-info {
+  min-width: 0;
+}
+
+.paypal-recipient-label {
+  font-size: 0.78rem;
+  color: var(--m3-sys-color-on-surface-variant);
+  font-weight: 500;
+}
+
+.paypal-recipient-tag {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--card-text);
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+.paypal-amounts-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.paypal-action-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-paypal-main {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px 20px;
+  background: #0070ba;
+  color: #ffffff;
+  font-family: var(--m3-font-brand);
+  font-size: 0.96rem;
+  font-weight: 700;
+  border-radius: var(--m3-shape-corner-full);
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(0, 112, 186, 0.35);
+  transition: all var(--m3-motion-duration-short) ease;
+}
+
+.btn-paypal-main:hover {
+  background: #005ea6;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 112, 186, 0.45);
+}
+
+.btn-paypal-copy {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--m3-shape-corner-full);
+  border: 1px solid var(--card-border);
+  background: var(--card-hover-bg);
+  color: var(--card-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all var(--m3-motion-duration-short) ease;
+  flex-shrink: 0;
+}
+
+.btn-paypal-copy:hover {
+  background: var(--m3-sys-color-primary-container);
+  color: var(--m3-sys-color-on-primary-container);
+  border-color: var(--m3-sys-color-primary);
+}
+
+/* ---------------- MOMO PANEL ---------------- */
+.momo-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.momo-header-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--m3-sys-color-surface-container-highest);
+  border: 1px solid var(--card-border);
+  border-radius: var(--m3-shape-corner-small);
+  padding: 12px 16px;
+}
+
+.momo-icon-badge {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--m3-shape-corner-full);
+  background: #a50064;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.momo-title-info {
+  min-width: 0;
+}
+
+.momo-title-text {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--card-text);
+}
+
+.momo-desc-text {
+  font-size: 0.82rem;
+  color: var(--m3-sys-color-on-surface-variant);
+  margin-top: 2px;
+}
+
+.momo-details-box {
+  background: var(--card-hover-bg);
+  border: 1px dashed var(--card-border);
+  border-radius: var(--m3-shape-corner-small);
+  padding: 12px 16px;
+  text-align: center;
+}
+
+.momo-target-val {
+  font-size: 0.92rem;
+  color: var(--card-text);
+  word-break: break-all;
+}
+
+.momo-action-row {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-momo-main {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  background: #a50064;
+  color: #ffffff;
+  font-size: 0.92rem;
+  font-weight: 700;
+  border-radius: var(--m3-shape-corner-full);
+  text-decoration: none;
+  box-shadow: 0 4px 14px rgba(165, 0, 100, 0.3);
+  transition: all var(--m3-motion-duration-short) ease;
+}
+
+.btn-momo-main:hover {
+  background: #8b0054;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(165, 0, 100, 0.45);
+}
+
+.btn-momo-copy {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  background: var(--card-hover-bg);
+  color: var(--card-text);
+  border: 1px solid var(--card-border);
+  font-size: 0.92rem;
+  font-weight: 600;
+  border-radius: var(--m3-shape-corner-full);
+  cursor: pointer;
+  transition: all var(--m3-motion-duration-short) ease;
+}
+
+.btn-momo-copy:hover {
+  background: var(--m3-sys-color-primary-container);
+  color: var(--m3-sys-color-on-primary-container);
+  border-color: var(--m3-sys-color-primary);
+}
+
+/* Responsive adjustment for Mobile */
+@media (max-width: 600px) {
+  .vietqr-layout {
+    flex-direction: column;
+    align-items: center;
+  }
+  .vietqr-qr-container {
+    width: 100%;
+    max-width: 200px;
+  }
+  .vietqr-controls-container {
+    width: 100%;
+  }
+  .quick-amounts-bar {
+    justify-content: flex-start;
+  }
+  .bio-donation-toggle {
+    padding: 14px 16px;
+  }
+  .donation-content-inner {
+    padding: 14px 16px 18px;
+  }
+}
+
+/* ==========================================================================
    FOOTER & TOAST NOTIFICATION
    ========================================================================== */
 

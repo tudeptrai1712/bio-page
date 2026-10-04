@@ -53,6 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         links: 'Custom Links',
         profile: 'Profile Details',
         socials: 'Social Links',
+        donations: 'Support & Donations',
         appearance: 'Appearance & Themes',
         analytics: 'Analytics & Insights',
         settings: 'Account & Passkeys'
@@ -427,6 +428,8 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (window.M3Theme) {
         window.M3Theme.applyDynamicTokens(currentProfile.accent_color || '#818cf8', currentProfile.color_mode || 'auto');
       }
+
+      populateDonationFields(currentProfile);
 
     } catch (err) {
       showToast('Error loading profile settings', true);
@@ -891,6 +894,138 @@ document.addEventListener('DOMContentLoaded', async () => {
       showToast('Connection error', true);
     }
   });
+
+  // -------------------------------------------------------------
+  // 3.5. DONATIONS MANAGEMENT
+  // -------------------------------------------------------------
+  let availableBanks = [];
+  async function loadBanks() {
+    const bankSelect = document.getElementById('donation-vietqr-bank');
+    if (!bankSelect) return;
+    try {
+      const res = await fetch('/api/banks');
+      if (res.ok) {
+        availableBanks = await res.json();
+        const currentBank = (currentProfile.donation_vietqr_bank || 'MB').toUpperCase();
+        bankSelect.innerHTML = availableBanks.map(b => {
+          const selected = b.code.toUpperCase() === currentBank ? 'selected' : '';
+          return `<option value="${escapeHtml(b.code)}" ${selected}>${escapeHtml(b.short_name)} - ${escapeHtml(b.name)} (${escapeHtml(b.code)})</option>`;
+        }).join('');
+      }
+    } catch (e) {
+      console.warn('Failed to load bank list:', e);
+    }
+  }
+
+  function populateDonationFields(profile) {
+    if (!profile) return;
+    const toggleEnabled = document.getElementById('donations-enabled-toggle');
+    const inputTitle = document.getElementById('donation-title-input');
+    const inputDesc = document.getElementById('donation-desc-input');
+
+    const toggleVietqr = document.getElementById('donation-vietqr-enabled');
+    const selectBank = document.getElementById('donation-vietqr-bank');
+    const inputAcc = document.getElementById('donation-vietqr-acc');
+    const inputHolder = document.getElementById('donation-vietqr-holder');
+    const selectTemplate = document.getElementById('donation-vietqr-template');
+    const inputDefaultDes = document.getElementById('donation-vietqr-default-des');
+
+    const togglePaypal = document.getElementById('donation-paypal-enabled');
+    const inputPaypalUser = document.getElementById('donation-paypal-username');
+    const selectPaypalCurrency = document.getElementById('donation-paypal-currency');
+    const inputPaypalAmounts = document.getElementById('donation-paypal-amounts');
+
+    const toggleMomo = document.getElementById('donation-momo-enabled');
+    const inputMomoTitle = document.getElementById('donation-momo-title');
+    const inputMomoUrl = document.getElementById('donation-momo-url');
+    const inputMomoDesc = document.getElementById('donation-momo-desc');
+
+    if (toggleEnabled) toggleEnabled.checked = profile.donations_enabled !== 0;
+    if (inputTitle) inputTitle.value = profile.donation_title || 'Support & Donations';
+    if (inputDesc) inputDesc.value = profile.donation_desc || 'Tip or donate via VietQR, PayPal, or MoMo';
+
+    if (toggleVietqr) toggleVietqr.checked = profile.donation_vietqr_enabled !== 0;
+    if (selectBank && profile.donation_vietqr_bank) selectBank.value = profile.donation_vietqr_bank;
+    if (inputAcc) inputAcc.value = profile.donation_vietqr_acc || '';
+    if (inputHolder) inputHolder.value = profile.donation_vietqr_holder || '';
+    if (selectTemplate && profile.donation_vietqr_template) selectTemplate.value = profile.donation_vietqr_template;
+    if (inputDefaultDes) inputDefaultDes.value = profile.donation_vietqr_default_des || 'Donate';
+
+    if (togglePaypal) togglePaypal.checked = profile.donation_paypal_enabled !== 0;
+    if (inputPaypalUser) inputPaypalUser.value = profile.donation_paypal_username || '';
+    if (selectPaypalCurrency && profile.donation_paypal_currency) selectPaypalCurrency.value = profile.donation_paypal_currency;
+    if (inputPaypalAmounts) inputPaypalAmounts.value = profile.donation_paypal_amounts || '5,10,25,50';
+
+    if (toggleMomo) toggleMomo.checked = profile.donation_momo_enabled !== 0;
+    if (inputMomoTitle) inputMomoTitle.value = profile.donation_momo_title || 'MoMo';
+    if (inputMomoUrl) inputMomoUrl.value = profile.donation_momo_url || '';
+    if (inputMomoDesc) inputMomoDesc.value = profile.donation_momo_desc || 'Scan QR or send to wallet';
+  }
+
+  // Save Donations Event Listener
+  const btnSaveDonations = document.getElementById('btn-save-donations');
+  if (btnSaveDonations) {
+    btnSaveDonations.addEventListener('click', async () => {
+      const toggleEnabled = document.getElementById('donations-enabled-toggle');
+      const inputTitle = document.getElementById('donation-title-input');
+      const inputDesc = document.getElementById('donation-desc-input');
+
+      const toggleVietqr = document.getElementById('donation-vietqr-enabled');
+      const selectBank = document.getElementById('donation-vietqr-bank');
+      const inputAcc = document.getElementById('donation-vietqr-acc');
+      const inputHolder = document.getElementById('donation-vietqr-holder');
+      const selectTemplate = document.getElementById('donation-vietqr-template');
+      const inputDefaultDes = document.getElementById('donation-vietqr-default-des');
+
+      const togglePaypal = document.getElementById('donation-paypal-enabled');
+      const inputPaypalUser = document.getElementById('donation-paypal-username');
+      const selectPaypalCurrency = document.getElementById('donation-paypal-currency');
+      const inputPaypalAmounts = document.getElementById('donation-paypal-amounts');
+
+      const toggleMomo = document.getElementById('donation-momo-enabled');
+      const inputMomoTitle = document.getElementById('donation-momo-title');
+      const inputMomoUrl = document.getElementById('donation-momo-url');
+      const inputMomoDesc = document.getElementById('donation-momo-desc');
+
+      const payload = {
+        ...currentProfile,
+        donations_enabled: toggleEnabled ? (toggleEnabled.checked ? 1 : 0) : 1,
+        donation_title: inputTitle ? inputTitle.value.trim() : 'Support & Donations',
+        donation_desc: inputDesc ? inputDesc.value.trim() : '',
+        donation_vietqr_enabled: toggleVietqr ? (toggleVietqr.checked ? 1 : 0) : 1,
+        donation_vietqr_bank: selectBank ? selectBank.value : 'MB',
+        donation_vietqr_acc: inputAcc ? inputAcc.value.trim() : '',
+        donation_vietqr_holder: inputHolder ? inputHolder.value.trim().toUpperCase() : '',
+        donation_vietqr_template: selectTemplate ? selectTemplate.value : 'compact',
+        donation_vietqr_default_des: inputDefaultDes ? inputDefaultDes.value.trim() : 'Donate',
+        donation_paypal_enabled: togglePaypal ? (togglePaypal.checked ? 1 : 0) : 1,
+        donation_paypal_username: inputPaypalUser ? inputPaypalUser.value.trim().replace(/^https:\/\/paypal\.me\//i, '').replace(/^@/, '') : '',
+        donation_paypal_currency: selectPaypalCurrency ? selectPaypalCurrency.value : 'USD',
+        donation_paypal_amounts: inputPaypalAmounts ? inputPaypalAmounts.value.trim() : '5,10,25,50',
+        donation_momo_enabled: toggleMomo ? (toggleMomo.checked ? 1 : 0) : 1,
+        donation_momo_title: inputMomoTitle ? inputMomoTitle.value.trim() : 'MoMo',
+        donation_momo_url: inputMomoUrl ? inputMomoUrl.value.trim() : '',
+        donation_momo_desc: inputMomoDesc ? inputMomoDesc.value.trim() : ''
+      };
+
+      try {
+        const res = await fetch('/api/admin/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          const resData = await res.json();
+          if (resData.profile) currentProfile = resData.profile;
+          showToast('Donation settings saved successfully! 💖');
+        } else {
+          showToast('Failed to save donation settings', true);
+        }
+      } catch (err) {
+        showToast('Network error saving donations', true);
+      }
+    });
+  }
 
   // -------------------------------------------------------------
   // 4. APPEARANCE & THEMES
@@ -1384,6 +1519,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   loadLinks();
   loadProfile();
   loadSocials();
+  loadBanks();
   loadTotpStatus();
 
   function escapeHtml(str) {

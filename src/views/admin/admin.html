@@ -39,6 +39,9 @@
       <li class="nav-item" data-tab="socials">
         <button><i class="fas fa-share-nodes"></i> <span>Social Links</span></button>
       </li>
+      <li class="nav-item" data-tab="donations">
+        <button><i class="fas fa-hand-holding-dollar"></i> <span>Donations</span></button>
+      </li>
       <li class="nav-item" data-tab="appearance">
         <button><i class="fas fa-palette"></i> <span>Appearance</span></button>
       </li>
@@ -239,6 +242,181 @@
           <div class="form-grid" id="social-inputs-container">
             <!-- Populated via Javascript -->
           </div>
+        </div>
+      </section>
+
+      <!-- TAB: DONATIONS -->
+      <section class="tab-pane" id="tab-donations">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <h2 class="card-title"><i class="fas fa-hand-holding-dollar text-primary"></i> Support & Donations</h2>
+              <p class="card-desc">Configure the donation drop-down menu with VietQR, PayPal, and MoMo/Fixed receiver.</p>
+            </div>
+            <button class="btn btn-primary" id="btn-save-donations">
+              <i class="fas fa-floppy-disk"></i> Save Donations
+            </button>
+          </div>
+
+          <form id="form-donations">
+            <!-- Global Donation Toggle -->
+            <div style="background: var(--bg-hover); padding: 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <strong style="display: block; font-size: 0.95rem; color: var(--text-main); margin-bottom: 2px;">
+                  <i class="fas fa-toggle-on text-primary"></i> Enable Donation Menu
+                </strong>
+                <small style="color: var(--text-muted);">Show or hide the entire donation drop-down menu on your public bio page.</small>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="donations-enabled-toggle" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <!-- General Donation Info -->
+            <div class="form-grid">
+              <div class="form-group">
+                <label class="form-label" for="donation-title-input">Menu Heading Title</label>
+                <input type="text" id="donation-title-input" class="form-control" placeholder="Support & Donations">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="donation-desc-input">Short Subtitle / Description</label>
+                <input type="text" id="donation-desc-input" class="form-control" placeholder="Tip or donate via VietQR, PayPal, or MoMo">
+              </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 24px 0;">
+
+            <!-- Slot 1: VietQR Settings -->
+            <div style="margin-bottom: 24px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                <div>
+                  <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--primary); margin-bottom: 2px;">
+                    <i class="fas fa-qrcode"></i> Slot 1: VietQR (Custom Money & Message)
+                  </h3>
+                  <small style="color: var(--text-muted);">Generates dynamic QR codes in real-time using VietQR standard and official bank list.</small>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="donation-vietqr-enabled" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label" for="donation-vietqr-bank">Ngân hàng (Vietnamese Bank)</label>
+                  <select id="donation-vietqr-bank" class="form-control">
+                    <option value="MB">MBBank - Ngân hàng TMCP Quân đội (MB)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="donation-vietqr-acc">Số tài khoản</label>
+                  <input type="text" id="donation-vietqr-acc" class="form-control" placeholder="Ví dụ: 0123456789">
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label" for="donation-vietqr-holder">Tên chủ tài khoản (Không dấu)</label>
+                  <input type="text" id="donation-vietqr-holder" class="form-control" placeholder="Ví dụ: NGUYEN VAN A">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="donation-vietqr-template">Mẫu giao diện QR (Template)</label>
+                  <select id="donation-vietqr-template" class="form-control">
+                    <option value="compact">Compact (Tiêu chuẩn kèm logo)</option>
+                    <option value="compact2">Compact 2 (Kèm logo & thông tin)</option>
+                    <option value="qr_only">QR Only (Chỉ mã QR tinh gọn)</option>
+                    <option value="print">Print (Khổ in)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="donation-vietqr-default-des">Nội dung chuyển khoản mặc định</label>
+                <input type="text" id="donation-vietqr-default-des" class="form-control" placeholder="Ví dụ: Donate hoặc Ung ho">
+              </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 24px 0;">
+
+            <!-- Slot 2: PayPal Settings -->
+            <div style="margin-bottom: 24px;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                <div>
+                  <h3 style="font-size: 1.05rem; font-weight: 700; color: #0070ba; margin-bottom: 2px;">
+                    <i class="fab fa-paypal"></i> Slot 2: PayPal (Customizable Amount Link)
+                  </h3>
+                  <small style="color: var(--text-muted);">Generates direct <code>paypal.me/YourName/25USD</code> links with custom donor amounts.</small>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="donation-paypal-enabled" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label" for="donation-paypal-username">PayPal.me Username / Handle</label>
+                  <div style="position: relative; display: flex; align-items: center;">
+                    <span style="position: absolute; left: 12px; color: var(--text-muted); font-size: 0.88rem; pointer-events: none;">paypal.me/</span>
+                    <input type="text" id="donation-paypal-username" class="form-control" style="padding-left: 92px;" placeholder="YourName">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="donation-paypal-currency">Currency</label>
+                  <select id="donation-paypal-currency" class="form-control">
+                    <option value="USD">USD ($)</option>
+                    <option value="EUR">EUR (€)</option>
+                    <option value="GBP">GBP (£)</option>
+                    <option value="CAD">CAD ($)</option>
+                    <option value="AUD">AUD ($)</option>
+                    <option value="JPY">JPY (¥)</option>
+                    <option value="SGD">SGD ($)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="donation-paypal-amounts">Quick Amount Presets (Comma-separated)</label>
+                <input type="text" id="donation-paypal-amounts" class="form-control" placeholder="5,10,25,50">
+                <small style="color: var(--text-muted); display: block; margin-top: 4px;">Preset buttons shown to donors (e.g. <code>5,10,25,50</code>).</small>
+              </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 24px 0;">
+
+            <!-- Slot 3: MoMo / Fixed Money Slot -->
+            <div>
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                <div>
+                  <h3 style="font-size: 1.05rem; font-weight: 700; color: #a50064; margin-bottom: 2px;">
+                    <i class="fas fa-wallet"></i> Slot 3: MoMo / Fixed Receiver
+                  </h3>
+                  <small style="color: var(--text-muted);">Fixed link or wallet details (MoMo link, phone number, or transfer wallet).</small>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="donation-momo-enabled" checked>
+                  <span class="slider"></span>
+                </label>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label" for="donation-momo-title">Wallet Slot Title</label>
+                  <input type="text" id="donation-momo-title" class="form-control" placeholder="MoMo">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="donation-momo-url">MoMo Link or Phone / Account</label>
+                  <input type="text" id="donation-momo-url" class="form-control" placeholder="https://me.momo.vn/... hoặc số điện thoại">
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="donation-momo-desc">Short Instruction / Note</label>
+                <input type="text" id="donation-momo-desc" class="form-control" placeholder="Scan mã QR hoặc chuyển tiền qua ví MoMo">
+              </div>
+            </div>
+          </form>
         </div>
       </section>
 

@@ -7,6 +7,8 @@
 
 const { db } = require('./db');
 const { getCache, setCache } = require('./redis');
+const banksData = require('./data/banks.json');
+const bankMap = new Map(banksData.map(b => [b.code.toUpperCase(), b]));
 
 // -------------------------------------------------------------
 // 1. SERVER-SIDE MONET DYNAMIC COLOR ENGINE
@@ -349,6 +351,226 @@ async function renderPublicBioPage() {
     `;
   });
 
+  // -------------------------------------------------------------
+  // Donation Dropdown Section
+  // -------------------------------------------------------------
+  let donationSectionHtml = '';
+  const isDonationEnabled = profile.donations_enabled !== 0;
+  const isVietqrEnabled = isDonationEnabled && profile.donation_vietqr_enabled !== 0 && !!(profile.donation_vietqr_acc && profile.donation_vietqr_acc.trim());
+  const isPaypalEnabled = isDonationEnabled && profile.donation_paypal_enabled !== 0 && !!(profile.donation_paypal_username && profile.donation_paypal_username.trim());
+  const isMomoEnabled = isDonationEnabled && profile.donation_momo_enabled !== 0 && !!((profile.donation_momo_url && profile.donation_momo_url.trim()) || (profile.donation_momo_title && profile.donation_momo_title.trim()));
+
+  if (isDonationEnabled && (isVietqrEnabled || isPaypalEnabled || isMomoEnabled)) {
+    const defaultMethod = isVietqrEnabled ? 'vietqr' : (isPaypalEnabled ? 'paypal' : 'momo');
+    const bankCode = (profile.donation_vietqr_bank || 'MB').toUpperCase();
+    const bankObj = bankMap.get(bankCode);
+    const bankDisplay = bankObj ? `${bankObj.short_name} (${bankObj.code})` : bankCode;
+
+    const rawPaypalAmounts = (profile.donation_paypal_amounts || '5,10,25,50')
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+    const paypalAmounts = rawPaypalAmounts.length > 0 ? rawPaypalAmounts : ['5', '10', '25', '50'];
+    const initialPaypalAmt = paypalAmounts.includes('25') ? '25' : (paypalAmounts[0] || '25');
+
+    const vietqrInitialUrl = `https://vietqr.app/img?acc=${encodeURIComponent(profile.donation_vietqr_acc || '')}&bank=${encodeURIComponent(profile.donation_vietqr_bank || 'MB')}&amount=0&des=${encodeURIComponent(profile.donation_vietqr_default_des || 'Donate')}&template=${encodeURIComponent(profile.donation_vietqr_template || 'compact')}${profile.donation_vietqr_holder ? '&holder=' + encodeURIComponent(profile.donation_vietqr_holder) : ''}`;
+
+    donationSectionHtml = `
+      <!-- Donation Drop-down Section -->
+      <section class="bio-donation-section" aria-label="Support and Donations">
+        <div class="bio-donation-card" id="bio-donation-card">
+          <button class="bio-donation-toggle m3-ripple-surface" id="btn-donation-toggle" type="button" aria-expanded="false" aria-controls="donation-accordion-content">
+            <div class="donation-toggle-left">
+              <div class="donation-toggle-icon">
+                <i class="fas fa-hand-holding-dollar"></i>
+              </div>
+              <div class="donation-toggle-info">
+                <div class="donation-toggle-title">${escapeHtml(profile.donation_title || 'Support & Donations')}</div>
+                <div class="donation-toggle-desc">${escapeHtml(profile.donation_desc || 'Tip or donate via VietQR, PayPal, or MoMo')}</div>
+              </div>
+            </div>
+            <div class="donation-toggle-chevron">
+              <i class="fas fa-chevron-down" id="donation-chevron-icon"></i>
+            </div>
+          </button>
+
+          <div class="donation-accordion-content" id="donation-accordion-content">
+            <div class="donation-content-inner">
+              <!-- Method Switcher Tabs -->
+              <div class="donation-methods-tabs" role="tablist">
+                ${isVietqrEnabled ? `
+                  <button type="button" class="donation-tab-btn ${defaultMethod === 'vietqr' ? 'active' : ''}" data-target="vietqr" role="tab" aria-selected="${defaultMethod === 'vietqr'}">
+                    <i class="fas fa-qrcode"></i> <span>VietQR</span>
+                  </button>
+                ` : ''}
+                ${isPaypalEnabled ? `
+                  <button type="button" class="donation-tab-btn ${defaultMethod === 'paypal' ? 'active' : ''}" data-target="paypal" role="tab" aria-selected="${defaultMethod === 'paypal'}">
+                    <i class="fab fa-paypal"></i> <span>PayPal</span>
+                  </button>
+                ` : ''}
+                ${isMomoEnabled ? `
+                  <button type="button" class="donation-tab-btn ${defaultMethod === 'momo' ? 'active' : ''}" data-target="momo" role="tab" aria-selected="${defaultMethod === 'momo'}">
+                    <i class="fas fa-wallet"></i> <span>${escapeHtml(profile.donation_momo_title || 'MoMo')}</span>
+                  </button>
+                ` : ''}
+              </div>
+
+              <!-- Panels Container -->
+              <div class="donation-panels-container">
+                ${isVietqrEnabled ? `
+                  <div class="donation-panel ${defaultMethod === 'vietqr' ? 'active' : ''}" id="panel-donation-vietqr" role="tabpanel"
+                       data-bank="${escapeHtml(profile.donation_vietqr_bank || 'MB')}"
+                       data-acc="${escapeHtml(profile.donation_vietqr_acc || '')}"
+                       data-holder="${escapeHtml(profile.donation_vietqr_holder || '')}"
+                       data-template="${escapeHtml(profile.donation_vietqr_template || 'compact')}"
+                       data-default-des="${escapeHtml(profile.donation_vietqr_default_des || 'Donate')}">
+                    
+                    <div class="vietqr-layout">
+                      <div class="vietqr-qr-container">
+                        <div class="vietqr-img-wrapper" id="vietqr-img-box">
+                          <img id="vietqr-live-img"
+                               src="${vietqrInitialUrl}"
+                               alt="VietQR Payment Code"
+                               class="vietqr-image"
+                               loading="lazy">
+                        </div>
+                        <div class="vietqr-quick-actions">
+                          <button type="button" class="btn-qr-action m3-ripple-surface" id="btn-copy-acc" data-acc="${escapeHtml(profile.donation_vietqr_acc || '')}">
+                            <i class="fas fa-copy"></i> <span>Copy STK</span>
+                          </button>
+                          <button type="button" class="btn-qr-action m3-ripple-surface" id="btn-copy-all-vietqr">
+                            <i class="fas fa-file-invoice"></i> <span>Copy TT</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div class="vietqr-controls-container">
+                        <div class="bank-details-card">
+                          <div class="bank-detail-row">
+                            <span class="detail-label">Ngân hàng:</span>
+                            <span class="detail-val font-semibold" id="display-vietqr-bank">${escapeHtml(bankDisplay)}</span>
+                          </div>
+                          <div class="bank-detail-row">
+                            <span class="detail-label">Số tài khoản:</span>
+                            <span class="detail-val font-mono font-semibold" id="display-vietqr-acc">${escapeHtml(profile.donation_vietqr_acc || '')}</span>
+                          </div>
+                          ${profile.donation_vietqr_holder ? `
+                          <div class="bank-detail-row">
+                            <span class="detail-label">Chủ tài khoản:</span>
+                            <span class="detail-val uppercase font-semibold" id="display-vietqr-holder">${escapeHtml(profile.donation_vietqr_holder)}</span>
+                          </div>` : ''}
+                        </div>
+
+                        <div class="vietqr-input-group">
+                          <label class="vietqr-field-label">Số tiền (VNĐ):</label>
+                          <div class="quick-amounts-bar" id="vietqr-quick-amounts">
+                            <button type="button" class="amount-chip" data-amount="10000">10.000₫</button>
+                            <button type="button" class="amount-chip" data-amount="20000">20.000₫</button>
+                            <button type="button" class="amount-chip" data-amount="50000">50.000₫</button>
+                            <button type="button" class="amount-chip" data-amount="100000">100.000₫</button>
+                            <button type="button" class="amount-chip" data-amount="200000">200.000₫</button>
+                          </div>
+                          <div class="custom-amount-wrapper">
+                            <input type="number" id="input-vietqr-amount" class="donation-input" placeholder="Nhập số tiền tuỳ chọn (VNĐ)" min="0" step="1000">
+                            <span class="input-currency-badge">VNĐ</span>
+                          </div>
+                        </div>
+
+                        <div class="vietqr-input-group">
+                          <label class="vietqr-field-label" for="input-vietqr-msg">Nội dung chuyển khoản / Lời nhắn:</label>
+                          <input type="text" id="input-vietqr-msg" class="donation-input" value="${escapeHtml(profile.donation_vietqr_default_des || 'Donate')}" placeholder="Lời nhắn hoặc tên bạn" maxlength="100">
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ` : ''}
+
+                ${isPaypalEnabled ? `
+                  <div class="donation-panel ${defaultMethod === 'paypal' ? 'active' : ''}" id="panel-donation-paypal" role="tabpanel"
+                       data-paypal-user="${escapeHtml(profile.donation_paypal_username || '')}"
+                       data-paypal-currency="${escapeHtml(profile.donation_paypal_currency || 'USD')}">
+                    
+                    <div class="paypal-container">
+                      <div class="paypal-header-info">
+                        <div class="paypal-icon-badge">
+                          <i class="fab fa-paypal"></i>
+                        </div>
+                        <div class="paypal-recipient-info">
+                          <div class="paypal-recipient-label">Send via PayPal to:</div>
+                          <div class="paypal-recipient-tag">paypal.me/${escapeHtml(profile.donation_paypal_username)}</div>
+                        </div>
+                      </div>
+
+                      <div class="paypal-amounts-section">
+                        <label class="vietqr-field-label">Choose or enter amount (${escapeHtml(profile.donation_paypal_currency || 'USD')}):</label>
+                        <div class="quick-amounts-bar" id="paypal-quick-amounts">
+                          ${paypalAmounts.map((amt) => {
+                            const isInitial = amt === initialPaypalAmt;
+                            return `<button type="button" class="amount-chip ${isInitial ? 'active' : ''}" data-amount="${escapeHtml(amt)}">${escapeHtml(amt)} ${escapeHtml(profile.donation_paypal_currency || 'USD')}</button>`;
+                          }).join('')}
+                        </div>
+
+                        <div class="custom-amount-wrapper">
+                          <input type="number" id="input-paypal-custom" class="donation-input" placeholder="Custom amount" min="1" step="any" value="${escapeHtml(initialPaypalAmt)}">
+                          <span class="input-currency-badge">${escapeHtml(profile.donation_paypal_currency || 'USD')}</span>
+                        </div>
+                      </div>
+
+                      <div class="paypal-action-row">
+                        <a id="btn-paypal-checkout"
+                           href="https://paypal.me/${encodeURIComponent(profile.donation_paypal_username)}/${encodeURIComponent(initialPaypalAmt)}${encodeURIComponent(profile.donation_paypal_currency || 'USD')}"
+                           target="_blank"
+                           rel="noopener noreferrer"
+                           class="btn-paypal-main m3-ripple-surface">
+                          <i class="fab fa-paypal"></i>
+                          <span id="paypal-btn-text">Send ${escapeHtml(initialPaypalAmt)} ${escapeHtml(profile.donation_paypal_currency || 'USD')} via PayPal</span>
+                        </a>
+                        <button type="button" class="btn-paypal-copy m3-ripple-surface" id="btn-copy-paypal" title="Copy PayPal Link">
+                          <i class="fas fa-copy"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ` : ''}
+
+                ${isMomoEnabled ? `
+                  <div class="donation-panel ${defaultMethod === 'momo' ? 'active' : ''}" id="panel-donation-momo" role="tabpanel">
+                    <div class="momo-container">
+                      <div class="momo-header-info">
+                        <div class="momo-icon-badge">
+                          <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="momo-title-info">
+                          <div class="momo-title-text">${escapeHtml(profile.donation_momo_title || 'MoMo')}</div>
+                          <div class="momo-desc-text">${escapeHtml(profile.donation_momo_desc || 'Scan QR or send to wallet')}</div>
+                        </div>
+                      </div>
+
+                      <div class="momo-details-box">
+                        <div class="momo-target-val font-mono" id="momo-target-val">${escapeHtml(profile.donation_momo_url || '')}</div>
+                      </div>
+
+                      <div class="momo-action-row">
+                        ${profile.donation_momo_url && (profile.donation_momo_url.startsWith('http://') || profile.donation_momo_url.startsWith('https://')) ? `
+                          <a href="${escapeHtml(profile.donation_momo_url)}" target="_blank" rel="noopener noreferrer" class="btn-momo-main m3-ripple-surface">
+                            <i class="fas fa-arrow-up-right-from-square"></i> <span>Open ${escapeHtml(profile.donation_momo_title || 'MoMo')}</span>
+                          </a>
+                        ` : ''}
+                        <button type="button" class="btn-momo-copy m3-ripple-surface" id="btn-copy-momo" data-val="${escapeHtml(profile.donation_momo_url || '')}">
+                          <i class="fas fa-copy"></i> <span>Copy Info</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    `;
+  }
+
   // Final Compiled HTML (External stylesheet only, Zero inline styles, Zero inline scripts)
   const compiledHtml = `<!DOCTYPE html>
 <html lang="en">
@@ -404,6 +626,8 @@ async function renderPublicBioPage() {
     <section class="links-list-container" aria-label="Custom and Social links">
       ${linkCardsHtml}
     </section>
+
+    ${donationSectionHtml}
 
     <!-- Footer -->
     <footer class="bio-page-footer">

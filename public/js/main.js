@@ -133,6 +133,218 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // -------------------------------------------------------------
+  // DONATION DROP-DOWN MENU CONTROLLER
+  // -------------------------------------------------------------
+  const donationCard = document.getElementById('bio-donation-card');
+  const btnDonationToggle = document.getElementById('btn-donation-toggle');
+
+  if (donationCard && btnDonationToggle) {
+    btnDonationToggle.addEventListener('click', () => {
+      const isOpen = donationCard.classList.contains('open');
+      if (isOpen) {
+        donationCard.classList.remove('open');
+        btnDonationToggle.setAttribute('aria-expanded', 'false');
+      } else {
+        donationCard.classList.add('open');
+        btnDonationToggle.setAttribute('aria-expanded', 'true');
+      }
+    });
+
+    // Method Switcher Tabs
+    const tabButtons = donationCard.querySelectorAll('.donation-tab-btn');
+    const tabPanels = donationCard.querySelectorAll('.donation-panel');
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const target = btn.getAttribute('data-target');
+        tabButtons.forEach(b => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
+        tabPanels.forEach(p => p.classList.remove('active'));
+
+        btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
+        const activePanel = document.getElementById(`panel-donation-${target}`);
+        if (activePanel) activePanel.classList.add('active');
+      });
+    });
+
+    // --- 1. VietQR Slot Controller ---
+    const panelVietqr = document.getElementById('panel-donation-vietqr');
+    if (panelVietqr) {
+      const liveImg = document.getElementById('vietqr-live-img');
+      const inputAmount = document.getElementById('input-vietqr-amount');
+      const inputMsg = document.getElementById('input-vietqr-msg');
+      const quickAmountChips = panelVietqr.querySelectorAll('.amount-chip');
+      const btnCopyAcc = document.getElementById('btn-copy-acc');
+      const btnCopyAll = document.getElementById('btn-copy-all-vietqr');
+
+      const bank = panelVietqr.getAttribute('data-bank') || 'MB';
+      const acc = panelVietqr.getAttribute('data-acc') || '';
+      const holder = panelVietqr.getAttribute('data-holder') || '';
+      const template = panelVietqr.getAttribute('data-template') || 'compact';
+
+      let vietqrTimer = null;
+      function updateVietqr() {
+        const rawAmt = inputAmount ? inputAmount.value.trim() : '';
+        const amt = parseInt(rawAmt, 10) || 0;
+        const msg = inputMsg ? inputMsg.value.trim() : (panelVietqr.getAttribute('data-default-des') || 'Donate');
+
+        let url = `https://vietqr.app/img?acc=${encodeURIComponent(acc)}&bank=${encodeURIComponent(bank)}&amount=${amt}&des=${encodeURIComponent(msg)}&template=${encodeURIComponent(template)}`;
+        if (holder) {
+          url += `&holder=${encodeURIComponent(holder)}`;
+        }
+        if (liveImg) {
+          liveImg.src = url;
+        }
+      }
+
+      function debounceUpdateVietqr() {
+        clearTimeout(vietqrTimer);
+        vietqrTimer = setTimeout(updateVietqr, 350);
+      }
+
+      if (quickAmountChips) {
+        quickAmountChips.forEach(chip => {
+          chip.addEventListener('click', () => {
+            const amt = chip.getAttribute('data-amount');
+            quickAmountChips.forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            if (inputAmount) inputAmount.value = amt;
+            updateVietqr();
+          });
+        });
+      }
+
+      if (inputAmount) {
+        inputAmount.addEventListener('input', () => {
+          const val = inputAmount.value.trim();
+          quickAmountChips.forEach(c => {
+            if (c.getAttribute('data-amount') === val) {
+              c.classList.add('active');
+            } else {
+              c.classList.remove('active');
+            }
+          });
+          debounceUpdateVietqr();
+        });
+      }
+
+      if (inputMsg) {
+        inputMsg.addEventListener('input', debounceUpdateVietqr);
+      }
+
+      if (btnCopyAcc) {
+        btnCopyAcc.addEventListener('click', () => {
+          const accNum = btnCopyAcc.getAttribute('data-acc') || acc;
+          navigator.clipboard.writeText(accNum).then(() => {
+            showToast('Đã sao chép số tài khoản! 📋');
+          });
+        });
+      }
+
+      if (btnCopyAll) {
+        btnCopyAll.addEventListener('click', () => {
+          const rawAmt = inputAmount ? inputAmount.value.trim() : '';
+          const amt = parseInt(rawAmt, 10) || 0;
+          const msg = inputMsg ? inputMsg.value.trim() : '';
+          const bankDisplay = document.getElementById('display-vietqr-bank')?.textContent || bank;
+          let text = `Ngân hàng: ${bankDisplay}\nSố tài khoản: ${acc}`;
+          if (holder) text += `\nChủ tài khoản: ${holder}`;
+          if (amt > 0) text += `\nSố tiền: ${amt.toLocaleString('vi-VN')} VNĐ`;
+          if (msg) text += `\nNội dung: ${msg}`;
+
+          navigator.clipboard.writeText(text).then(() => {
+            showToast('Đã sao chép thông tin chuyển khoản! 📋');
+          });
+        });
+      }
+    }
+
+    // --- 2. PayPal Slot Controller ---
+    const panelPaypal = document.getElementById('panel-donation-paypal');
+    if (panelPaypal) {
+      const paypalUser = panelPaypal.getAttribute('data-paypal-user') || '';
+      const paypalCurrency = panelPaypal.getAttribute('data-paypal-currency') || 'USD';
+      const inputPaypalCustom = document.getElementById('input-paypal-custom');
+      const paypalChips = panelPaypal.querySelectorAll('.amount-chip');
+      const btnPaypalCheckout = document.getElementById('btn-paypal-checkout');
+      const paypalBtnText = document.getElementById('paypal-btn-text');
+      const btnCopyPaypal = document.getElementById('btn-copy-paypal');
+
+      function updatePaypal(amount) {
+        const cleanAmt = String(amount || '').trim();
+        let targetUrl = `https://paypal.me/${encodeURIComponent(paypalUser)}`;
+        let btnLabel = `Donate via PayPal`;
+
+        if (cleanAmt && parseFloat(cleanAmt) > 0) {
+          targetUrl += `/${encodeURIComponent(cleanAmt)}${encodeURIComponent(paypalCurrency)}`;
+          btnLabel = `Send ${cleanAmt} ${paypalCurrency} via PayPal`;
+        }
+
+        if (btnPaypalCheckout) {
+          btnPaypalCheckout.href = targetUrl;
+        }
+        if (paypalBtnText) {
+          paypalBtnText.textContent = btnLabel;
+        }
+      }
+
+      if (paypalChips) {
+        paypalChips.forEach(chip => {
+          chip.addEventListener('click', () => {
+            const amt = chip.getAttribute('data-amount');
+            paypalChips.forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            if (inputPaypalCustom) inputPaypalCustom.value = amt;
+            updatePaypal(amt);
+          });
+        });
+      }
+
+      if (inputPaypalCustom) {
+        inputPaypalCustom.addEventListener('input', () => {
+          const val = inputPaypalCustom.value.trim();
+          paypalChips.forEach(c => {
+            if (c.getAttribute('data-amount') === val) {
+              c.classList.add('active');
+            } else {
+              c.classList.remove('active');
+            }
+          });
+          updatePaypal(val);
+        });
+      }
+
+      if (btnCopyPaypal) {
+        btnCopyPaypal.addEventListener('click', () => {
+          const currentUrl = btnPaypalCheckout ? btnPaypalCheckout.href : `https://paypal.me/${paypalUser}`;
+          navigator.clipboard.writeText(currentUrl).then(() => {
+            showToast('PayPal link copied to clipboard! 📋');
+          });
+        });
+      }
+    }
+
+    // --- 3. MoMo / Fixed Slot Controller ---
+    const panelMomo = document.getElementById('panel-donation-momo');
+    if (panelMomo) {
+      const btnCopyMomo = document.getElementById('btn-copy-momo');
+      if (btnCopyMomo) {
+        btnCopyMomo.addEventListener('click', () => {
+          const val = btnCopyMomo.getAttribute('data-val') || document.getElementById('momo-target-val')?.textContent || '';
+          if (val) {
+            navigator.clipboard.writeText(val).then(() => {
+              showToast('Đã sao chép thông tin MoMo! 📋');
+            });
+          }
+        });
+      }
+    }
+  }
+
   // Material 3 Ripple Motion Effect
   document.addEventListener('click', (e) => {
     const target = e.target.closest('.m3-ripple-surface, .topbar-icon-btn, .btn, .bio-link-card, .contact-icon-pill');

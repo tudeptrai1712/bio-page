@@ -71,6 +71,23 @@ function initDatabase() {
       color_mode TEXT DEFAULT 'auto',
       show_share_button INTEGER DEFAULT 1,
       allow_password_login INTEGER DEFAULT 1,
+      donations_enabled INTEGER DEFAULT 1,
+      donation_title TEXT DEFAULT 'Support & Donations',
+      donation_desc TEXT DEFAULT 'Tip or donate via MoMo, PayPal, or VietQR',
+      donation_momo_enabled INTEGER DEFAULT 1,
+      donation_momo_title TEXT DEFAULT 'MoMo',
+      donation_momo_url TEXT DEFAULT '',
+      donation_momo_desc TEXT DEFAULT 'Scan or transfer via MoMo',
+      donation_paypal_enabled INTEGER DEFAULT 1,
+      donation_paypal_username TEXT DEFAULT '',
+      donation_paypal_currency TEXT DEFAULT 'USD',
+      donation_paypal_amounts TEXT DEFAULT '5,10,25,50',
+      donation_vietqr_enabled INTEGER DEFAULT 1,
+      donation_vietqr_bank TEXT DEFAULT 'MB',
+      donation_vietqr_acc TEXT DEFAULT '',
+      donation_vietqr_holder TEXT DEFAULT '',
+      donation_vietqr_template TEXT DEFAULT 'compact',
+      donation_vietqr_default_des TEXT DEFAULT 'Donate',
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -117,6 +134,23 @@ function initDatabase() {
   try { db.exec("ALTER TABLE profile ADD COLUMN allow_password_login INTEGER DEFAULT 1"); } catch(e){}
   try { db.exec("ALTER TABLE users ADD COLUMN totp_secret TEXT DEFAULT ''"); } catch(e){}
   try { db.exec("ALTER TABLE users ADD COLUMN totp_enabled INTEGER DEFAULT 0"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donations_enabled INTEGER DEFAULT 1"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donation_title TEXT DEFAULT 'Support & Donations'"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donation_desc TEXT DEFAULT 'Tip or donate via MoMo, PayPal, or VietQR'"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donation_momo_enabled INTEGER DEFAULT 1"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donation_momo_title TEXT DEFAULT 'MoMo'"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donation_momo_url TEXT DEFAULT ''"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donation_momo_desc TEXT DEFAULT 'Scan or transfer via MoMo'"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donation_paypal_enabled INTEGER DEFAULT 1"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donation_paypal_username TEXT DEFAULT ''"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donation_paypal_currency TEXT DEFAULT 'USD'"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donation_paypal_amounts TEXT DEFAULT '5,10,25,50'"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donation_vietqr_enabled INTEGER DEFAULT 1"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donation_vietqr_bank TEXT DEFAULT 'MB'"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donation_vietqr_acc TEXT DEFAULT ''"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donation_vietqr_holder TEXT DEFAULT ''"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donation_vietqr_template TEXT DEFAULT 'compact'"); } catch(e){}
+  try { db.exec("ALTER TABLE profile ADD COLUMN donation_vietqr_default_des TEXT DEFAULT 'Donate'"); } catch(e){}
 
   // Seed default admin if not exists
   const userCount = db.prepare('SELECT COUNT(*) AS count FROM users').get().count;
