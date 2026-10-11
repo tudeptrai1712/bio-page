@@ -6,6 +6,8 @@
 [![Security: OWASP ASVS L2](https://img.shields.io/badge/Security-OWASP%20ASVS%20v4.0%20L2-success)](https://owasp.org/www-project-application-security-verification-standard/)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 
+[![Architecture diagram of tudeptrai1712/bio-page](https://gitdiagram.com/tudeptrai1712/bio-page/diagram.png)](https://gitdiagram.com/tudeptrai1712/bio-page?utm_source=readme&utm_medium=picture)
+
 A high-performance, modern, self-hosted link-in-bio page (alternative to Linktree / Bento) with an interactive **Admin Panel**, **Redis sub-millisecond caching & real-time analytics**, **Passwordless WebAuthn / Passkeys** (Touch ID, Windows Hello, Face ID, YubiKey), **TOTP 2FA / Fallback Recovery**, and **OWASP ASVS Level 2 Hardening** ready for **Cloudflare Tunnel** deployment.
 
 Images are **automatically built for `amd64` and `arm64` via GitHub Actions** and published to the **GitHub Container Registry (GHCR)**.
