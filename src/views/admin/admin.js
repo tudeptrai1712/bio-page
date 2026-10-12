@@ -116,10 +116,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // Logout
-  document.getElementById('btn-logout').addEventListener('click', async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    window.location.href = '/login.html';
-  });
+  const btnLogout = document.getElementById('btn-logout');
+  if (btnLogout) {
+    btnLogout.addEventListener('click', async () => {
+      await fetch('/api/auth/logout', { method: 'POST' });
+      window.location.href = '/login.html';
+    });
+  }
 
   // -------------------------------------------------------------
   // 1. LINKS MANAGEMENT

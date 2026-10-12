@@ -262,24 +262,32 @@ body.sidebar-locked {
 }
 
 .btn-logout {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: transparent;
+  background: var(--bg-input);
   border: 1px solid var(--border-color);
   color: var(--danger);
-  padding: 10px;
+  padding: 7px 16px;
   border-radius: var(--radius-full);
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
   transition: all var(--m3-motion-duration-short) ease;
+  white-space: nowrap;
 }
 
 .btn-logout:hover {
-  background: rgba(251, 113, 133, 0.15);
+  background: rgba(251, 113, 133, 0.16);
   border-color: var(--danger);
+  color: var(--danger);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(251, 113, 133, 0.2);
+}
+
+.btn-logout:active {
+  transform: scale(0.96);
 }
 
 /* Main Content Area */
@@ -347,6 +355,13 @@ body.sidebar-locked {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
 }
 
 .user-badge {
@@ -1253,6 +1268,16 @@ input:checked + .slider:before {
     font-size: 1.05rem;
   }
 
+  .topbar-right {
+    gap: 8px;
+  }
+
+  .btn-logout {
+    padding: 6px 12px;
+    font-size: 0.82rem;
+    gap: 6px;
+  }
+
   .user-badge {
     padding: 4px 10px;
     font-size: 0.82rem;
@@ -1515,6 +1540,17 @@ input:checked + .slider:before {
   .crop-btn-group .btn-crop-action {
     flex: 1 1 auto;
     justify-content: center;
+  }
+}
+
+/* Narrow Phones (<= 480px) */
+@media (max-width: 480px) {
+  .btn-logout span {
+    display: none; /* Icon-only on narrow screens */
+  }
+
+  .btn-logout {
+    padding: 6px 10px;
   }
 }
 
